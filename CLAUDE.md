@@ -60,6 +60,7 @@ There is no Xcode project, Swift package, source code, or test target yet, so th
 ## Testing
 
 - Unit tests for UseCases, Repositories (with protocol fakes), ViewModels, and validators.
+- Order: UI tests for the full order flow, from catalogue browsing to order confirmation.
 - Memory: run Instruments Leaks and Allocations on main flows. Fix retain cycles from ViewModel closures.
 - Performance: XCTest `measure` blocks for parsing, caching, and list rendering. Keep a baseline.
 - Battery: check Instruments Energy Log on network-heavy and image-heavy screens. Batch requests and avoid polling.
