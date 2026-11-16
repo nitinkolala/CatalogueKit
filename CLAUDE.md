@@ -4,7 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current state
 
-The repo has only `README.md` and an Xcode/Swift `.gitignore`. No Xcode project, Swift package, or tests exist yet. Check for `.xcodeproj`, `.xcworkspace`, or `Package.swift` before assuming a build exists, and don't invent build, test, or lint commands.
+The repository is nearly empty. It contains only:
+
+- `README.md`: a single heading, `# CatalogueKit`, with no description yet.
+- `.gitignore`: the standard GitHub template for Xcode, Objective-C and Swift projects (plus Swift Package Manager entries).
+
+There is no Xcode project, Swift package, source code, or test target yet, so there are no build, lint, or test commands to run. Don't invent them. Check for a `.xcodeproj`, `.xcworkspace`, or `Package.swift` before assuming any of them exist.
+
+## Expectations for future work
+
+- The `.gitignore` indicates the project will be an Apple-platform (Xcode / Swift) codebase. Once a project is added, update this file with the real build, test, and run commands and the architecture.
+- Git: the default branch is `main`, and the remote is `origin` (`github.com/nitinkolala/CatalogueKit`).
 
 ## Stack
 
