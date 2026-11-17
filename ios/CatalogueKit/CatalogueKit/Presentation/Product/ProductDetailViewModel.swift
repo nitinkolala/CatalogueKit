@@ -18,6 +18,7 @@ final class ProductDetailViewModel {
 
     private let productId: Int
     private let getProductDetail: GetProductDetailUseCase
+    private var hasRefreshed = false
 
     init(product: Product, getProductDetail: GetProductDetailUseCase) {
         self.product = product
@@ -25,6 +26,14 @@ final class ProductDetailViewModel {
         self.getProductDetail = getProductDetail
     }
 
+    /// Called when the page appears. Fetches the latest copy once per visit, and again only if that failed.
+    /// Coming back from the Enquiry form keeps what is on screen.
+    func loadIfNeeded() async {
+        guard !hasRefreshed, !isRefreshing, phase != .notFound else { return }
+        await load()
+    }
+
+    /// Fetches the latest copy. Used for the first load, pull to refresh and Retry.
     func load() async {
         isRefreshing = true
         defer { isRefreshing = false }
@@ -32,6 +41,7 @@ final class ProductDetailViewModel {
         do {
             product = try await getProductDetail.execute(id: productId)
             phase = .loaded
+            hasRefreshed = true
         } catch is CancellationError {
             return
         } catch let error as ProductLoadError {

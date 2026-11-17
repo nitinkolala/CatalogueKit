@@ -14,16 +14,6 @@ actor KeyedDiskCache<Value: Codable & Sendable> {
         self.fileURL = fileURL
     }
 
-    /// The file lives in the app's Caches folder, so iOS may clear it when storage is low.
-    static func defaultFileURL(named fileName: String) throws -> URL {
-        let caches = try FileManager.default.url(
-            for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true
-        )
-        let directory = caches.appending(path: Constants.Cache.directoryName, directoryHint: .isDirectory)
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        return directory.appending(path: fileName)
-    }
-
     func load(key: String) -> Entry? {
         allEntries()[key]
     }

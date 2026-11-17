@@ -20,7 +20,7 @@ struct ProductDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .task { await viewModel.load() }
+        .task { await viewModel.loadIfNeeded() }
     }
 
     private func content(for product: Product) -> some View {

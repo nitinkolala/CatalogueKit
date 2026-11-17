@@ -31,7 +31,7 @@ private struct ZoomableImage: View {
     @GestureState private var pinch: CGFloat = 1
 
     var body: some View {
-        CachedImageView(url: url, loader: loader)
+        CachedImageView(url: url, loader: loader, maxPoints: Constants.Images.detailMaxPoints)
             .scaleEffect(clamped(zoom * pinch))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipped()

@@ -14,15 +14,6 @@ actor ProductsDiskCache {
         self.fileURL = fileURL
     }
 
-    static func defaultFileURL() throws -> URL {
-        let caches = try FileManager.default.url(
-            for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true
-        )
-        let directory = caches.appending(path: Constants.Cache.directoryName, directoryHint: .isDirectory)
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        return directory.appending(path: Constants.Cache.productsFileName)
-    }
-
     func load() -> Entry? {
         if let memory { return memory }
         guard let data = try? Data(contentsOf: fileURL),

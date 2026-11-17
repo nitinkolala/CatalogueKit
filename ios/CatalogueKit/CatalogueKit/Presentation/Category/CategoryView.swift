@@ -32,7 +32,7 @@ struct CategoryView: View {
             searchFocused = false
         }
         .textInputAutocapitalization(.never)
-        .task { await viewModel.load() }
+        .task { await viewModel.loadIfNeeded() }
     }
 
     @ViewBuilder

@@ -16,6 +16,20 @@ nonisolated enum Constants {
         static let productsFileName = "featured-products.json"
         static let categoriesFileName = "categories.json"
         static let categoryProductsFileName = "category-products.json"
+        static let imagesFolderName = "images"
+        /// Bytes of the base-URL hash used in each backend's cache folder name.
+        static let folderHashBytes = 4
+        /// Files and folders that older builds saved directly under `directoryName`, shared by every backend.
+        static let legacyEntryNames = [productsFileName, categoriesFileName, categoryProductsFileName, imagesFolderName]
+    }
+
+    enum Images {
+        /// Longest side, in points, of a product card image. Images are decoded at this size times the screen scale.
+        static let cardMaxPoints: CGFloat = 240
+        /// Longest side, in points, of a product page image. Allows some zoom before the image looks soft.
+        static let detailMaxPoints: CGFloat = 600
+        /// Memory budget for decoded images. The cache drops the least recently used images beyond this.
+        static let memoryCacheBytes = 64 * 1024 * 1024
     }
 
     enum Home {

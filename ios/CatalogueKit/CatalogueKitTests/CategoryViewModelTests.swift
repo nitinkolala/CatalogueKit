@@ -43,4 +43,73 @@ final class CategoryViewModelTests: XCTestCase {
 
         XCTAssertEqual(viewModel.state, .failed)
     }
+
+    // MARK: - Loading on appearance
+
+    /// Counts calls and answers from a result the test can change between calls.
+    private final class CountingCategoryProductsUseCase: GetCategoryProductsUseCase, @unchecked Sendable {
+        var result: Result<CategoryProducts, Error>
+        private(set) var calls = 0
+
+        init(result: Result<CategoryProducts, Error>) {
+            self.result = result
+        }
+
+        func execute(_ category: ProductCategory) async throws -> CategoryProducts {
+            calls += 1
+            return try result.get()
+        }
+    }
+
+    func testAppearingAgainAfterALoadDoesNotReload() async {
+        let page = CategoryProducts(topRated: [TestData.product(id: 1)], more: [])
+        let useCase = CountingCategoryProductsUseCase(result: .success(page))
+        let viewModel = CategoryViewModel(category: category, getCategoryProducts: useCase)
+
+        await viewModel.loadIfNeeded()
+        // Back from a product page.
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(useCase.calls, 1)
+        XCTAssertEqual(viewModel.state, .loaded(page))
+    }
+
+    func testAppearingAgainAfterAFailureLoadsAgain() async {
+        let page = CategoryProducts(topRated: [TestData.product(id: 1)], more: [])
+        let useCase = CountingCategoryProductsUseCase(result: .failure(StubError.offline))
+        let viewModel = CategoryViewModel(category: category, getCategoryProducts: useCase)
+
+        await viewModel.loadIfNeeded()
+        XCTAssertEqual(viewModel.state, .failed)
+
+        useCase.result = .success(page)
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(useCase.calls, 2)
+        XCTAssertEqual(viewModel.state, .loaded(page))
+    }
+
+    func testRetryStillLoadsAfterASuccessfulLoad() async {
+        let useCase = CountingCategoryProductsUseCase(result: .success(CategoryProducts(topRated: [], more: [])))
+        let viewModel = CategoryViewModel(category: category, getCategoryProducts: useCase)
+
+        await viewModel.loadIfNeeded()
+        await viewModel.load()
+
+        XCTAssertEqual(useCase.calls, 2, "An explicit load always asks again")
+    }
+
+    func testCancelledLoadPutsBackThePreviousStateAndLoadsAgainNextTime() async {
+        let page = CategoryProducts(topRated: [TestData.product(id: 1)], more: [])
+        let useCase = CountingCategoryProductsUseCase(result: .failure(CancellationError()))
+        let viewModel = CategoryViewModel(category: category, getCategoryProducts: useCase)
+
+        await viewModel.loadIfNeeded()
+        XCTAssertEqual(viewModel.state, .loading, "A cancelled load is not shown as a failure")
+
+        useCase.result = .success(page)
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(viewModel.state, .loaded(page))
+    }
 }

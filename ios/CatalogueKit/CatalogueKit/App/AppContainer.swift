@@ -16,16 +16,21 @@ final class AppContainer {
         self.environment = environment
 
         let httpClient = URLSessionHTTPClient()
-        let remote = RemoteProductDataSource(client: httpClient, baseURL: environment.baseURL)
-        let cache = ProductsDiskCache(fileURL: try ProductsDiskCache.defaultFileURL())
+        let baseURL = environment.baseURL
+        let remote = RemoteProductDataSource(client: httpClient, baseURL: baseURL)
+
+        // Every cache lives in a folder for this backend only. Files from before that split are removed.
+        CacheLocation.removeLegacyFiles()
+        let cacheDirectory = try CacheLocation.directory(for: environment, baseURL: baseURL)
+        let cache = ProductsDiskCache(fileURL: cacheDirectory.appending(path: Constants.Cache.productsFileName))
         let repository = FeaturedProductsRepository(remote: remote, cache: cache)
         let categoryRepository = CachingCategoryRepository(
             remote: RemoteCategoryRepository(remote: remote),
             categoriesCache: KeyedDiskCache(
-                fileURL: try KeyedDiskCache<[ProductCategory]>.defaultFileURL(named: Constants.Cache.categoriesFileName)
+                fileURL: cacheDirectory.appending(path: Constants.Cache.categoriesFileName)
             ),
             productsCache: KeyedDiskCache(
-                fileURL: try KeyedDiskCache<CategoryProducts>.defaultFileURL(named: Constants.Cache.categoryProductsFileName)
+                fileURL: cacheDirectory.appending(path: Constants.Cache.categoryProductsFileName)
             )
         )
 
@@ -36,7 +41,7 @@ final class AppContainer {
 
         self.imageLoader = ImageLoader(
             client: httpClient,
-            diskDirectory: try ImageLoader.defaultDiskDirectory()
+            diskDirectory: try CacheLocation.subdirectory(Constants.Cache.imagesFolderName, in: cacheDirectory)
         )
         self.homeViewModel = HomeViewModel(
             getFeaturedProducts: DefaultGetFeaturedProductsUseCase(repository: repository),

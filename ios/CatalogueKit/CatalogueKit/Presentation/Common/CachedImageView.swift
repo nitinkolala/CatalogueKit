@@ -2,9 +2,13 @@ import SwiftUI
 import UIKit
 
 /// Shows an image from `ImageLoader`: a spinner while loading, and a fallback icon if it fails.
+/// The image is decoded no larger than `maxPoints` on its longest side, at the screen's scale.
 struct CachedImageView: View {
     let url: URL
     let loader: ImageLoader
+    var maxPoints: CGFloat = Constants.Images.cardMaxPoints
+
+    @Environment(\.displayScale) private var displayScale
 
     private enum Phase {
         case loading
@@ -13,6 +17,10 @@ struct CachedImageView: View {
     }
 
     @State private var phase: Phase = .loading
+
+    private var maxPixelSize: Int {
+        Int((maxPoints * displayScale).rounded(.up))
+    }
 
     var body: some View {
         Group {
@@ -29,8 +37,8 @@ struct CachedImageView: View {
                     .foregroundStyle(.tertiary)
             }
         }
-        .task(id: url) {
-            if let image = await loader.image(for: url) {
+        .task(id: ImageLoader.cacheKey(url: url, maxPixelSize: maxPixelSize)) {
+            if let image = await loader.image(for: url, maxPixelSize: maxPixelSize) {
                 phase = .loaded(image)
             } else {
                 phase = .failed

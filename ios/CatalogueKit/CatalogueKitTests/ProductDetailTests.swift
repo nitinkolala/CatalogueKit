@@ -80,6 +80,66 @@ final class ProductDetailViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.phase, .loaded)
         XCTAssertEqual(viewModel.product, latest)
     }
+
+    // MARK: - Loading on appearance
+
+    func testAppearingAgainAfterARefreshDoesNotReload() async {
+        let calls = CallCounter()
+        let viewModel = makeViewModel { _ in
+            calls.increment()
+            return self.seed
+        }
+
+        await viewModel.loadIfNeeded()
+        // Back from the Enquiry form.
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(calls.value, 1)
+    }
+
+    func testAppearingAgainAfterAFailureLoadsAgain() async {
+        let calls = CallCounter()
+        let latest = TestData.product(id: 5, rate: 4.9)
+        let viewModel = makeViewModel { _ in
+            let call = calls.value
+            calls.increment()
+            if call == 0 { throw ProductLoadError.offline }
+            return latest
+        }
+
+        await viewModel.loadIfNeeded()
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(calls.value, 2)
+        XCTAssertEqual(viewModel.product, latest)
+    }
+
+    func testNotFoundIsNotLoadedAgainOnAppearance() async {
+        let calls = CallCounter()
+        let viewModel = makeViewModel { _ in
+            calls.increment()
+            throw ProductLoadError.notFound
+        }
+
+        await viewModel.loadIfNeeded()
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(calls.value, 1)
+        XCTAssertEqual(viewModel.phase, .notFound)
+    }
+
+    func testPullToRefreshStillLoadsAfterARefresh() async {
+        let calls = CallCounter()
+        let viewModel = makeViewModel { _ in
+            calls.increment()
+            return self.seed
+        }
+
+        await viewModel.loadIfNeeded()
+        await viewModel.load()
+
+        XCTAssertEqual(calls.value, 2, "Pull to refresh and Retry always ask again")
+    }
 }
 
 final class StockStatusTests: XCTestCase {
