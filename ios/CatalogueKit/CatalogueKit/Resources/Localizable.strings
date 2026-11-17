@@ -44,3 +44,44 @@
 "product.offline" = "You're offline. Showing the last details you loaded.";
 "product.load_failed" = "We couldn't refresh this product. Check your connection and try again.";
 "product.image_label" = "Image %1$d of %2$d for %3$@";
+
+
+/* Enquiry */
+"enquiry.enquire" = "Enquire";
+"enquiry.title" = "Enquire about this product";
+"enquiry.name_label" = "Name";
+"enquiry.email_label" = "Email";
+"enquiry.phone_label" = "Phone (optional)";
+"enquiry.message_label" = "Message";
+"enquiry.marketing" = "Send me offers and news about this range";
+"enquiry.privacy" = "We use your details only to answer this enquiry.";
+"enquiry.privacy_link" = "Read our privacy policy";
+"enquiry.submit" = "Submit enquiry";
+"enquiry.sent_title" = "Thank you";
+"enquiry.sent_body" = "Your enquiry has been sent. We will be in touch soon.";
+"enquiry.back_to_product" = "Back to product";
+"enquiry.discard_title" = "Discard your enquiry?";
+"enquiry.discard" = "Discard";
+"enquiry.keep_writing" = "Keep writing";
+"enquiry.cancel" = "Cancel";
+"enquiry.error_name" = "Enter your name";
+"enquiry.error_email" = "Enter a valid email address, such as name@example.com";
+"enquiry.error_phone" = "Enter a 10-digit phone number, or leave this blank";
+"enquiry.error_message" = "Enter a message";
+"enquiry.errors_announcement" = "Some fields need attention.";
+"enquiry.sent_announcement" = "Thank you. Your enquiry has been sent.";
+"enquiry.failed_announcement" = "Your enquiry could not be sent.";
+"enquiry.failed" = "We couldn't send your enquiry. Check your connection and try again. What you typed is still here.";
+"enquiry.offline" = "You're offline. What you typed is still here. Try again when you reconnect.";
+"enquiry.required_suffix" = "required";
+"enquiry.optional_suffix" = "optional";
+"enquiry.done" = "Done";
+"enquiry.counter" = "%1$d of %2$d characters";
+"enquiry.back" = "Back";
+"enquiry.about_label" = "Enquiring about";
+"enquiry.quick_title" = "Quick questions";
+"enquiry.prompt_stock" = "Is it in stock?";
+"enquiry.prompt_delivery" = "What are the delivery options?";
+"enquiry.prompt_warranty" = "What does the warranty cover?";
+"enquiry.message_placeholder" = "Tell us what you would like to know";
+"enquiry.missing" = "Add %@";

@@ -4,6 +4,7 @@ import { ERROR_CODES, ROUTES, createApp } from '../src/http/app.js';
 import type { Product, ProductSource } from '../src/domain/product.js';
 import { UpstreamError } from '../src/data/fakeStoreClient.js';
 import { ProductService } from '../src/services/productService.js';
+import type { EnquiryService } from '../src/services/enquiryService.js';
 
 const product = (id: number, rate: number): Product => ({
   id,
@@ -15,10 +16,13 @@ const product = (id: number, rate: number): Product => ({
   rating: { rate, count: 1 },
 });
 
+const noopEnquiries = { submit: async () => {} } as unknown as EnquiryService;
+
 const appWith = (source: ProductSource, featuredCount = 5) =>
   createApp({
     productService: new ProductService({ source, cacheTtlMs: 60_000 }),
     featuredCount,
+    enquiries: noopEnquiries,
   });
 
 describe('HTTP API', () => {

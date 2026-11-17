@@ -69,7 +69,19 @@ The Product page acceptance criteria assume data that Fake Store does not provid
 | 27. Share | Not built. | There is no product link to share. |
 | 4. Android back gesture | Not applicable. | This is an iOS build. The iOS swipe-from-left-edge back gesture works. |
 
-Rules built with a backend change: `GET /products/:id` returns one product and 404 for an unknown id. The product page keeps the product the customer tapped on screen, reloads it, and keeps the content if the reload fails. A product that no longer exists shows a not-found page with a Back button.
+Rules built with a backend change: `GET /products/:id` returns one product and 404 for an unknown id.
+
+### Enquiry rules: decisions and limits
+
+- **Sales email (rule 19).** The backend builds the email (product name, product link, customer details) and sends it through an `EmailSender` interface. The only adapter is `LogEmailSender`, which prints the email to the console. No email account is needed to run the app. A real provider (for example Amazon SES) is a new adapter.
+- **Submit enabled rule (10) vs. first-error scroll (11).** Submit is enabled once name, email and message are valid. A typed but invalid phone number still lets the customer submit, so the form shows the error and scrolls to the phone field. An invalid email or empty name keeps Submit disabled, so those errors are shown on blur instead.
+- **Return key (15).** Name and email move to the next field on Return. A phone pad has no Return key on iOS, so the phone field uses the toolbar Done button. The message is multi-line, so Return adds a new line and never submits.
+- **Back and Cancel (24).** Cancel shows a discard prompt when anything has been typed. The system back button is hidden. The edge swipe that pops the page is not intercepted, so a swipe can leave without the prompt.
+- **Privacy policy (26).** The link points to `https://example.com/privacy`, a placeholder until the client's policy URL is known.
+- **Marketing consent (27).** An optional checkbox, unticked by default. It is saved in the email but nothing acts on it.
+- **Rate limiting and spam protection.** Not built. The 16 KB body limit and the validation are the only protections.
+- **Not verified on the Simulator.** Landscape, VoiceOver and TalkBack reading order, and larger text sizes. Tapping Submit while the keyboard was open did not register in the Simulator. Tapping Done first, then Submit, worked. This needs checking on a real device.
+ The product page keeps the product the customer tapped on screen, reloads it, and keeps the content if the reload fails. A product that no longer exists shows a not-found page with a Back button.
 
 ## 5. How the design supports growth beyond the PoC
 

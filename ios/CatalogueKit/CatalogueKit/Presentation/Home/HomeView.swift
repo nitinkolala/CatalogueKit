@@ -9,6 +9,7 @@ struct HomeView: View {
     private let makeCategoryViewModel: (ProductCategory) -> CategoryViewModel
     private let makeCategorySearchViewModel: (ProductCategory) -> ProductSearchViewModel
     private let makeProductDetailViewModel: (Product) -> ProductDetailViewModel
+    private let makeEnquiryViewModel: (Product) -> EnquiryViewModel
 
     init(
         viewModel: HomeViewModel,
@@ -16,7 +17,8 @@ struct HomeView: View {
         imageLoader: ImageLoader,
         makeCategoryViewModel: @escaping (ProductCategory) -> CategoryViewModel,
         makeCategorySearchViewModel: @escaping (ProductCategory) -> ProductSearchViewModel,
-        makeProductDetailViewModel: @escaping (Product) -> ProductDetailViewModel
+        makeProductDetailViewModel: @escaping (Product) -> ProductDetailViewModel,
+        makeEnquiryViewModel: @escaping (Product) -> EnquiryViewModel
     ) {
         _viewModel = State(initialValue: viewModel)
         _search = State(initialValue: search)
@@ -24,6 +26,7 @@ struct HomeView: View {
         self.makeCategoryViewModel = makeCategoryViewModel
         self.makeCategorySearchViewModel = makeCategorySearchViewModel
         self.makeProductDetailViewModel = makeProductDetailViewModel
+        self.makeEnquiryViewModel = makeEnquiryViewModel
     }
 
     var body: some View {
@@ -61,6 +64,8 @@ struct HomeView: View {
                 viewModel: makeProductDetailViewModel(product),
                 imageLoader: imageLoader
             )
+        case .enquiry(let product):
+            EnquiryView(viewModel: makeEnquiryViewModel(product))
         case .category(let category):
             CategoryView(
                 viewModel: makeCategoryViewModel(category),

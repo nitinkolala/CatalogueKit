@@ -1,7 +1,9 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { UpstreamError } from '../data/fakeStoreClient.js';
 import type { ProductService } from '../services/productService.js';
+import type { EnquiryService } from '../services/enquiryService.js';
 import { SEARCH_LIMITS, normalizeQuery } from '../domain/search.js';
+import { validateEnquiry } from '../domain/enquiry.js';
 
 export const ROUTES = {
   health: '/health',
@@ -9,11 +11,14 @@ export const ROUTES = {
   featured: '/products/featured',
   categories: '/products/categories',
   search: '/products/search',
+  enquiries: '/enquiries',
 } as const;
 
 export const ERROR_CODES = {
   notFound: 'not_found',
   invalidQuery: 'invalid_query',
+  invalidEnquiry: 'invalid_enquiry',
+  invalidJson: 'invalid_json',
   upstreamUnavailable: 'upstream_unavailable',
   internal: 'internal_error',
 } as const;
@@ -27,11 +32,13 @@ function readIntParam(value: unknown, fallback: number, max = Number.MAX_SAFE_IN
 export interface AppDeps {
   productService: ProductService;
   featuredCount: number;
+  enquiries: EnquiryService;
 }
 
-export function createApp({ productService, featuredCount }: AppDeps) {
+export function createApp({ productService, featuredCount, enquiries }: AppDeps) {
   const app = express();
   app.disable('x-powered-by');
+  app.use(express.json({ limit: '16kb' }));
 
   app.get(ROUTES.health, (_req, res) => {
     res.json({ status: 'ok' });
@@ -108,6 +115,27 @@ export function createApp({ productService, featuredCount }: AppDeps) {
     }
   });
 
+  app.post(ROUTES.enquiries, async (req, res, next) => {
+    const result = validateEnquiry(req.body);
+    if (!result.ok) {
+      res.status(400).json({
+        error: { code: ERROR_CODES.invalidEnquiry, message: 'Check the highlighted fields', fields: result.errors },
+      });
+      return;
+    }
+    try {
+      const product = await productService.productById(result.value.productId);
+      if (!product) {
+        res.status(404).json({ error: { code: ERROR_CODES.notFound, message: 'Product not found' } });
+        return;
+      }
+      await enquiries.submit(result.value, product);
+      res.status(201).json({ ok: true });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.get(ROUTES.products, async (_req, res, next) => {
     try {
       res.json({ items: await productService.listProducts() });
@@ -121,6 +149,10 @@ export function createApp({ productService, featuredCount }: AppDeps) {
   });
 
   app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    if (error instanceof SyntaxError && 'body' in error) {
+      res.status(400).json({ error: { code: ERROR_CODES.invalidJson, message: 'Request body is not valid JSON' } });
+      return;
+    }
     if (error instanceof UpstreamError) {
       res.status(502).json({
         error: { code: ERROR_CODES.upstreamUnavailable, message: 'Product data is temporarily unavailable' },

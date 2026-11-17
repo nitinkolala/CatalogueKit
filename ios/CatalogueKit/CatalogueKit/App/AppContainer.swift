@@ -10,6 +10,7 @@ final class AppContainer {
     let makeCategoryViewModel: (ProductCategory) -> CategoryViewModel
     let makeCategorySearchViewModel: (ProductCategory) -> ProductSearchViewModel
     let makeProductDetailViewModel: (Product) -> ProductDetailViewModel
+    let makeEnquiryViewModel: (Product) -> EnquiryViewModel
 
     init(environment: AppEnvironment = .current) throws {
         self.environment = environment
@@ -45,6 +46,12 @@ final class AppContainer {
         let getProductDetail = DefaultGetProductDetailUseCase(
             repository: RemoteProductDetailRepository(remote: remote)
         )
+        let submitEnquiry = DefaultSubmitEnquiryUseCase(
+            repository: RemoteEnquiryRepository(client: httpClient, baseURL: environment.baseURL)
+        )
+        self.makeEnquiryViewModel = { product in
+            EnquiryViewModel(product: product, submitUseCase: submitEnquiry)
+        }
         self.makeProductDetailViewModel = { product in
             ProductDetailViewModel(product: product, getProductDetail: getProductDetail)
         }

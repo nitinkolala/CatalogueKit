@@ -17,7 +17,8 @@ struct CatalogueKitApp: App {
                     imageLoader: container.imageLoader,
                     makeCategoryViewModel: container.makeCategoryViewModel,
                     makeCategorySearchViewModel: container.makeCategorySearchViewModel,
-                    makeProductDetailViewModel: container.makeProductDetailViewModel
+                    makeProductDetailViewModel: container.makeProductDetailViewModel,
+                    makeEnquiryViewModel: container.makeEnquiryViewModel
                 )
             } else {
                 Text(L10n.homeLoadFailed)

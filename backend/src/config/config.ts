@@ -5,6 +5,8 @@ export interface AppConfig {
   cacheTtlMs: number;
   upstreamTimeoutMs: number;
   featuredListPath: string;
+  salesInbox: string;
+  productLinkBase: string;
 }
 
 export const DEFAULTS = {
@@ -14,6 +16,8 @@ export const DEFAULTS = {
   CACHE_TTL_SECONDS: 300,
   UPSTREAM_TIMEOUT_MS: 5000,
   FEATURED_LIST_PATH: 'data/featured.json',
+  SALES_INBOX: 'sales@example.com',
+  PRODUCT_LINK_BASE: 'http://localhost:3000/products',
 } as const;
 
 const MS_PER_SECOND = 1000;
@@ -37,5 +41,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     cacheTtlMs: readInt(env, 'CACHE_TTL_SECONDS', DEFAULTS.CACHE_TTL_SECONDS) * MS_PER_SECOND,
     upstreamTimeoutMs: readInt(env, 'UPSTREAM_TIMEOUT_MS', DEFAULTS.UPSTREAM_TIMEOUT_MS),
     featuredListPath: env.FEATURED_LIST_PATH?.trim() || DEFAULTS.FEATURED_LIST_PATH,
+    salesInbox: env.SALES_INBOX?.trim() || DEFAULTS.SALES_INBOX,
+    productLinkBase: env.PRODUCT_LINK_BASE?.trim() || DEFAULTS.PRODUCT_LINK_BASE,
   };
 }

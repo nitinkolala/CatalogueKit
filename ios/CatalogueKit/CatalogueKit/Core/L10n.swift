@@ -38,6 +38,51 @@ nonisolated enum L10n {
     static let productOffline = String(localized: "product.offline")
     static let productLoadFailed = String(localized: "product.load_failed")
 
+    static let enquireButton = String(localized: "enquiry.enquire")
+    static let enquiryTitle = String(localized: "enquiry.title")
+    static let enquiryNameLabel = String(localized: "enquiry.name_label")
+    static let enquiryEmailLabel = String(localized: "enquiry.email_label")
+    static let enquiryPhoneLabel = String(localized: "enquiry.phone_label")
+    static let enquiryMessageLabel = String(localized: "enquiry.message_label")
+    static let enquiryMarketing = String(localized: "enquiry.marketing")
+    static let enquiryPrivacy = String(localized: "enquiry.privacy")
+    static let enquiryPrivacyLink = String(localized: "enquiry.privacy_link")
+    static let enquirySubmit = String(localized: "enquiry.submit")
+    static let enquirySentTitle = String(localized: "enquiry.sent_title")
+    static let enquirySentBody = String(localized: "enquiry.sent_body")
+    static let enquiryBackToProduct = String(localized: "enquiry.back_to_product")
+    static let enquiryDiscardTitle = String(localized: "enquiry.discard_title")
+    static let enquiryDiscard = String(localized: "enquiry.discard")
+    static let enquiryKeepWriting = String(localized: "enquiry.keep_writing")
+    static let enquiryCancel = String(localized: "enquiry.cancel")
+    static let enquiryErrorName = String(localized: "enquiry.error_name")
+    static let enquiryErrorEmail = String(localized: "enquiry.error_email")
+    static let enquiryErrorPhone = String(localized: "enquiry.error_phone")
+    static let enquiryErrorMessage = String(localized: "enquiry.error_message")
+    static let enquiryErrorsAnnouncement = String(localized: "enquiry.errors_announcement")
+    static let enquirySentAnnouncement = String(localized: "enquiry.sent_announcement")
+    static let enquiryFailedAnnouncement = String(localized: "enquiry.failed_announcement")
+    static let enquiryFailed = String(localized: "enquiry.failed")
+    static let enquiryOffline = String(localized: "enquiry.offline")
+    static let enquiryRequiredSuffix = String(localized: "enquiry.required_suffix")
+    static let enquiryOptionalSuffix = String(localized: "enquiry.optional_suffix")
+    static let enquiryDone = String(localized: "enquiry.done")
+    static let enquiryBack = String(localized: "enquiry.back")
+    static let enquiryAboutLabel = String(localized: "enquiry.about_label")
+    static let enquiryQuickTitle = String(localized: "enquiry.quick_title")
+    static let enquiryPromptStock = String(localized: "enquiry.prompt_stock")
+    static let enquiryPromptDelivery = String(localized: "enquiry.prompt_delivery")
+    static let enquiryPromptWarranty = String(localized: "enquiry.prompt_warranty")
+    static let enquiryMessagePlaceholder = String(localized: "enquiry.message_placeholder")
+
+    static func enquiryMissing(_ fields: String) -> String {
+        String(format: String(localized: "enquiry.missing"), fields)
+    }
+
+    static func enquiryCounter(_ count: Int, _ limit: Int) -> String {
+        String(format: String(localized: "enquiry.counter"), count, limit)
+    }
+
     static func productImageLabel(_ name: String, _ index: Int, _ total: Int) -> String {
         String(format: String(localized: "product.image_label"), index, total, name)
     }

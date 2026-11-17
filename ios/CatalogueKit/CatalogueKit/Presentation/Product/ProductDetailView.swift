@@ -51,6 +51,13 @@ struct ProductDetailView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             stockLabel(StockStatus(available: product.available))
+            NavigationLink(value: AppRoute.enquiry(product)) {
+                Text(L10n.enquireButton)
+                    .font(.body.bold())
+                    .frame(maxWidth: .infinity, minHeight: Constants.Layout.minTouchTarget)
+            }
+            .buttonStyle(.bordered)
+            .padding(.top, Constants.ProductPage.statusBadgeSpacing)
         }
     }
 

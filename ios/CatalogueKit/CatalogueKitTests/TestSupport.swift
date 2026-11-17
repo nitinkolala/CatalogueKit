@@ -54,9 +54,14 @@ final class StubProductRepository: ProductRepository, @unchecked Sendable {
 
 struct StubHTTPClient: HTTPClient {
     let handler: @Sendable (URL) throws -> Data
+    var postHandler: @Sendable (URL, Data) throws -> Data = { _, _ in throw StubError.offline }
 
     func data(from url: URL) async throws -> Data {
         try handler(url)
+    }
+
+    func post(_ url: URL, body: Data) async throws -> Data {
+        try postHandler(url, body)
     }
 }
 

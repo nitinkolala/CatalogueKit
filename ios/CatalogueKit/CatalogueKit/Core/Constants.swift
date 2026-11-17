@@ -44,6 +44,23 @@ nonisolated enum Constants {
         static let code = "USD"
     }
 
+    enum Enquiry {
+        /// Placeholder until the client's privacy policy URL is known.
+        static let privacyPolicyURL = URL(string: "https://example.com/privacy")!
+        static let minTouchTarget: CGFloat = 44
+        static let sectionSpacing: CGFloat = 18
+        static let messageMinHeight: CGFloat = 120
+        static let cardCornerRadius: CGFloat = 14
+        static let tilePadding: CGFloat = 14
+        static let rowSpacing: CGFloat = 12
+        static let iconSize: CGFloat = 22
+        static let dividerInset: CGFloat = 48
+        static let chipSpacing: CGFloat = 8
+        static let successIconSize: CGFloat = 64
+        /// Inner inset that TextEditor adds around its text. Cancelled out so the text lines up with its label.
+        static let editorInset: CGFloat = 5
+    }
+
     enum Layout {
         /// Minimum tap target for any control, in points.
         static let minTouchTarget: CGFloat = 44
