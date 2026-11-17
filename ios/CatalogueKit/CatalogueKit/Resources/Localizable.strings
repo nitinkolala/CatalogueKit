@@ -37,8 +37,6 @@
 "product.spec_category" = "Category";
 "product.spec_id" = "Product ID";
 "product.spec_rating" = "Rating";
-"product.spec_availability" = "Availability";
-"product.reviews" = "Reviews";
 "product.not_found" = "We couldn't find this product. It may have been removed.";
 "product.back" = "Back";
 "product.offline" = "You're offline. Showing the last details you loaded.";
@@ -63,7 +61,6 @@
 "enquiry.discard_title" = "Discard your enquiry?";
 "enquiry.discard" = "Discard";
 "enquiry.keep_writing" = "Keep writing";
-"enquiry.cancel" = "Cancel";
 "enquiry.error_name" = "Enter your name";
 "enquiry.error_email" = "Enter a valid email address, such as name@example.com";
 "enquiry.error_phone" = "Enter a 10-digit phone number, or leave this blank";
