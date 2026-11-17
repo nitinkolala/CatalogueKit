@@ -1,0 +1,9 @@
+/* Home feature */
+"home.title" = "Featured";
+"home.empty" = "No featured products yet.";
+"home.load_failed" = "We couldn't load products. Check your connection and try again.";
+"home.retry" = "Try again";
+"home.rating_label" = "Rated %1$@ from %2$d reviews";
+
+/* Product */
+"product.out_of_stock" = "Out of stock";
