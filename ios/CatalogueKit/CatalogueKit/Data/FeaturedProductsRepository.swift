@@ -20,20 +20,20 @@ nonisolated struct FeaturedProductsRepository: ProductRepository {
         self.now = now
     }
 
-    func featuredProducts(forceRefresh: Bool) async throws -> [Product] {
+    func featuredProducts(forceRefresh: Bool) async throws -> FeaturedProducts {
         let current = now()
         if !forceRefresh,
            let cached = await cache.load(),
            current.timeIntervalSince(cached.savedAt) < timeToLive {
-            return cached.products
+            return FeaturedProducts(items: cached.products, isStale: false)
         }
         do {
             let fresh = try await remote.featuredProducts()
             await cache.save(fresh, at: current)
-            return fresh
+            return FeaturedProducts(items: fresh, isStale: false)
         } catch {
             if let stale = await cache.load() {
-                return stale.products
+                return FeaturedProducts(items: stale.products, isStale: true)
             }
             throw error
         }

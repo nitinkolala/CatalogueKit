@@ -29,7 +29,8 @@ final class FeaturedProductsRepositoryTests: XCTestCase {
 
         let result = try await repository.featuredProducts()
 
-        XCTAssertEqual(result, products)
+        XCTAssertEqual(result.items, products)
+        XCTAssertFalse(result.isStale)
     }
 
     func testServesFreshCacheWithoutCallingBackend() async throws {
@@ -88,7 +89,8 @@ final class FeaturedProductsRepositoryTests: XCTestCase {
 
         let result = try await offline.featuredProducts()
 
-        XCTAssertEqual(result, saved)
+        XCTAssertEqual(result.items, saved)
+        XCTAssertTrue(result.isStale, "A saved list served while offline must be flagged as stale")
     }
 
     func testForceRefreshBypassesFreshCache() async throws {

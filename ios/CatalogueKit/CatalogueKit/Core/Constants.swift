@@ -15,7 +15,6 @@ nonisolated enum Constants {
     }
 
     enum Home {
-        static let featuredCount = 5
         static let gridSpacing: CGFloat = 16
         static let gridMinimumWidth: CGFloat = 160
         static let featuredCardWidth: CGFloat = 185

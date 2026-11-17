@@ -27,6 +27,16 @@ describe('ProductService', () => {
     expect(featured.map((p) => p.id)).toEqual([7, 6, 5, 4, 3]);
   });
 
+  it('caps the admin-curated list at the configured count, keeping the admin order', async () => {
+    const service = new ProductService({
+      source: countingSource([1, 2, 3, 4].map((id) => product(id, id))),
+      cacheTtlMs: 60_000,
+      featuredEntries: [{ id: 4 }, { id: 2 }, { id: 1 }, { id: 3 }],
+    });
+    const featured = await service.featuredProducts(2);
+    expect(featured.map((p) => p.id)).toEqual([4, 2]);
+  });
+
   it('splits a category into top rated and the rest, and returns undefined for unknown categories', async () => {
     const service = new ProductService({
       source: countingSource([

@@ -78,10 +78,12 @@ export class ProductService {
       return rankTopRated(products, count);
     }
     const byId = new Map(products.map((product) => [product.id, product]));
-    return this.featuredEntries.flatMap((entry) => {
-      const product = byId.get(entry.id);
-      if (!product) return [];
-      return [{ ...product, available: entry.available ?? product.available }];
-    });
+    return this.featuredEntries
+      .flatMap((entry) => {
+        const product = byId.get(entry.id);
+        if (!product) return [];
+        return [{ ...product, available: entry.available ?? product.available }];
+      })
+      .slice(0, count);
   }
 }

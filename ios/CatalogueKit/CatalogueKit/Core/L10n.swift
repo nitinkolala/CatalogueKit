@@ -6,6 +6,8 @@ nonisolated enum L10n {
     static let homeEmpty = String(localized: "home.empty")
     static let homeLoadFailed = String(localized: "home.load_failed")
     static let homeRetry = String(localized: "home.retry")
+    static let homeCategoriesLoadFailed = String(localized: "home.categories_load_failed")
+    static let homeFeaturedStale = String(localized: "home.featured_stale")
     static let ratingLabel = String(localized: "home.rating_label")
     static let outOfStock = String(localized: "product.out_of_stock")
     static let featuredScrollLeft = String(localized: "home.featured_scroll_left")

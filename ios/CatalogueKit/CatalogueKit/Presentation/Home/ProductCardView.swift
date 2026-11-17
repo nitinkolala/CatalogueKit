@@ -22,6 +22,8 @@ struct ProductCardView: View {
                 .lineLimit(2, reservesSpace: true)
             Text(product.price, format: .currency(code: Constants.Currency.code))
                 .font(.headline)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
             Text(ProductFormatting.ratingText(for: product))
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -30,5 +32,7 @@ struct ProductCardView: View {
         .frame(maxWidth: .infinity, alignment: .top)
         .background(.background.secondary, in: RoundedRectangle(cornerRadius: Constants.Home.cardCornerRadius))
         .contentShape(Rectangle())
+        // Cards have a fixed grid width. Larger text is capped here so the rows stay aligned.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 }

@@ -85,3 +85,5 @@
 "enquiry.prompt_warranty" = "What does the warranty cover?";
 "enquiry.message_placeholder" = "Tell us what you would like to know";
 "enquiry.missing" = "Add %@";
+"home.categories_load_failed" = "Categories couldn't load.";
+"home.featured_stale" = "Couldn't refresh. Showing saved products.";

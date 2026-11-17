@@ -46,9 +46,9 @@ final class StubProductRepository: ProductRepository, @unchecked Sendable {
         self.result = result
     }
 
-    func featuredProducts(forceRefresh: Bool) async throws -> [Product] {
+    func featuredProducts(forceRefresh: Bool) async throws -> FeaturedProducts {
         callCount += 1
-        return try result.get()
+        return FeaturedProducts(items: try result.get(), isStale: false)
     }
 }
 

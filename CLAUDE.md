@@ -4,22 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current state
 
-The repository is nearly empty. It contains only:
+The repo holds a working proof of concept: an iOS app in `ios/CatalogueKit/` and a Node.js backend in `backend/`. See `README.md` for setup and `DECISIONS.md` for the assumptions behind it.
 
-- `README.md`: a single heading, `# CatalogueKit`, with no description yet.
-- `.gitignore`: the standard GitHub template for Xcode, Objective-C and Swift projects (plus Swift Package Manager entries).
+Commands (run from the folder shown):
 
-There is no Xcode project, Swift package, source code, or test target yet, so there are no build, lint, or test commands to run. Don't invent them. Check for a `.xcodeproj`, `.xcworkspace`, or `Package.swift` before assuming any of them exist.
+- Backend (`backend/`, Node 20+): `npm install`, `npm run dev` (port 3000), `npm test` (Vitest), `npm run typecheck`.
+- iOS (`ios/CatalogueKit/`): open `CatalogueKit.xcodeproj`, scheme `CatalogueKit`, run on an iPhone Simulator. Unit tests: `xcodebuild test -project CatalogueKit.xcodeproj -scheme CatalogueKit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:CatalogueKitTests`.
 
-## Expectations for future work
-
-- The `.gitignore` indicates the project will be an Apple-platform (Xcode / Swift) codebase. Once a project is added, update this file with the real build, test, and run commands and the architecture.
-- Git: the default branch is `main`, and the remote is `origin` (`github.com/nitinkolala/CatalogueKit`).
+Check for these before assuming other build tools exist. The backend uses `package.json` and `package-lock.json`, so use npm.
 
 ## Stack
 
-- iOS app in Swift, using Swift Concurrency and SwiftUI/UIKit as the project decides.
-- Node.js applies only if a backend is added to this repo. Check `package.json` for real scripts and the lockfile's package manager before running anything.
+- iOS app in Swift, using Swift Concurrency and SwiftUI.
+- Backend in TypeScript on Express 5, with the product data source behind the `ProductSource` interface. The client never calls the upstream product API directly.
+
+## Git
+
+- Default branch `main`. Work on feature branches and do not merge into `main` without asking.
+- Remote `origin` is `github.com/nitinkolala/CatalogueKit`.
 
 ## Architecture: MVVM + Clean
 
@@ -60,12 +62,13 @@ There is no Xcode project, Swift package, source code, or test target yet, so th
 ## Testing
 
 - Unit tests for UseCases, Repositories (with protocol fakes), ViewModels, and validators.
-- Order: UI tests for the full order flow, from catalogue browsing to order confirmation.
+- Backend tests cover search, categories, product lookup and enquiry validation through the HTTP routes (`backend/test`).
+- UI tests: the `CatalogueKitUITests` target is still the template. The order flow is out of scope for this PoC (DECISIONS.md, section 4). When UI tests are added, cover browse, product, and enquiry.
 - Memory: run Instruments Leaks and Allocations on main flows. Fix retain cycles from ViewModel closures.
 - Performance: XCTest `measure` blocks for parsing, caching, and list rendering. Keep a baseline.
 - Battery: check Instruments Energy Log on network-heavy and image-heavy screens. Batch requests and avoid polling.
 - Thermal: observe `ProcessInfo.thermalState` on long sessions. Reduce work (image sizes, animations) when the state is `.serious` or `.critical`.
-- Run tests with `xcodebuild test` on a simulator once the scheme exists.
+- Run iOS unit tests with `xcodebuild test` on the iPhone 17 Pro Simulator (commands in Current state). Run backend tests with `npm test`.
 
 ## Repo hygiene
 

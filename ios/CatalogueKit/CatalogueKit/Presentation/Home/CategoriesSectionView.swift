@@ -3,11 +3,23 @@ import SwiftUI
 /// The Categories section at the end of Home. Shows placeholder tiles while loading and nothing when hidden.
 struct CategoriesSectionView: View {
     let state: HomeViewModel.CategoriesState
+    /// Called when the customer taps Try again after a failed request.
+    var onRetry: () -> Void = {}
 
     var body: some View {
         switch state {
         case .hidden:
             EmptyView()
+        case .failed:
+            VStack(alignment: .leading, spacing: Constants.Home.gridSpacing) {
+                Text(L10n.categoriesTitle)
+                    .font(.title2.bold())
+                Text(L10n.homeCategoriesLoadFailed)
+                    .foregroundStyle(.secondary)
+                Button(L10n.homeRetry, action: onRetry)
+                    .buttonStyle(.borderedProminent)
+                    .frame(minHeight: Constants.Layout.minTouchTarget)
+            }
         case .loading:
             section {
                 ForEach(0..<Constants.Home.categoryPlaceholderCount, id: \.self) { _ in

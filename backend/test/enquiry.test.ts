@@ -115,6 +115,16 @@ describe('POST /enquiries', () => {
     expect(sent).toHaveLength(0);
   });
 
+  it('returns 413 when the body is larger than the 16 KB limit', async () => {
+    const { app, sent } = setup();
+    const res = await request(app)
+      .post(ROUTES.enquiries)
+      .send({ ...validBody, message: 'a'.repeat(20_000) });
+    expect(res.status).toBe(413);
+    expect(res.body.error.code).toBe(ERROR_CODES.payloadTooLarge);
+    expect(sent).toHaveLength(0);
+  });
+
   it('returns 400 for malformed JSON', async () => {
     const { app } = setup();
     const res = await request(app)

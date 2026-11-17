@@ -99,7 +99,9 @@ private struct HomeContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Constants.Home.sectionSpacing) {
                 featuredContent
-                CategoriesSectionView(state: viewModel.categories)
+                CategoriesSectionView(state: viewModel.categories) {
+                    Task { await viewModel.load(forceRefresh: true) }
+                }
             }
             .padding(Constants.Home.gridSpacing)
         }
@@ -114,7 +116,20 @@ private struct HomeContentView: View {
             ProgressView()
                 .frame(maxWidth: .infinity)
         case .loaded(let products):
-            FeaturedRowView(products: products, imageLoader: imageLoader)
+            VStack(alignment: .leading, spacing: Constants.Home.gridSpacing) {
+                FeaturedRowView(products: products, imageLoader: imageLoader)
+                if viewModel.featuredIsStale {
+                    HStack(spacing: Constants.Home.gridSpacing / 2) {
+                        Text(L10n.homeFeaturedStale)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                        Button(L10n.homeRetry) {
+                            Task { await viewModel.load(forceRefresh: true) }
+                        }
+                        .frame(minHeight: Constants.Layout.minTouchTarget)
+                    }
+                }
+            }
         case .empty:
             message(L10n.homeEmpty, showsRetry: false)
         case .failed:

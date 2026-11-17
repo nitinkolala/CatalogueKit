@@ -22,6 +22,16 @@ final class ValidatorTests: XCTestCase {
         XCTAssertFalse(MobileValidator.isValid("04123456789"), "11 digits")
     }
 
+    func testMobileIgnoresSpacesAroundTheNumber() {
+        XCTAssertTrue(MobileValidator.isValid("  0412345678  "), "leading and trailing spaces are formatting")
+    }
+
+    func testEmailValidatorDoesNotTrimSoTheDraftMustTrimFirst() {
+        // The draft trims before it validates (see testSuccessSendsTrimmedValuesAndClearsTheForm).
+        XCTAssertFalse(EmailValidator.isValid(" sam@example.com "))
+        XCTAssertTrue(EmailValidator.isValid("sam@example.com"))
+    }
+
     func testMobileIgnoresFormattingCharacters() {
         XCTAssertTrue(MobileValidator.isValid("(04) 1234-5678"))
         XCTAssertTrue(MobileValidator.isValid("041.234.5678"))

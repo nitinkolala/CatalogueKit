@@ -11,15 +11,19 @@ final class HomeViewModel {
         case failed
     }
 
-    /// The Categories section. It is hidden when there are no categories or the request fails.
+    /// The Categories section. It is hidden when the backend returns no categories. If the request fails,
+    /// it shows a message with a retry.
     enum CategoriesState: Equatable {
         case loading
         case loaded([ProductCategory])
         case hidden
+        case failed
     }
 
     private(set) var state: State = .idle
     private(set) var categories: CategoriesState = .loading
+    /// True when a refresh failed and the featured products on screen are the last ones loaded.
+    private(set) var featuredIsStale = false
     private let getFeaturedProducts: GetFeaturedProductsUseCase
     private let getCategories: GetCategoriesUseCase
 
@@ -41,10 +45,15 @@ final class HomeViewModel {
         if !isShowingProducts { state = .loading }
 
         do {
-            let products = try await getFeaturedProducts.execute(forceRefresh: forceRefresh)
-            state = products.isEmpty ? .empty : .loaded(products)
+            let result = try await getFeaturedProducts.execute(forceRefresh: forceRefresh)
+            state = result.items.isEmpty ? .empty : .loaded(result.items)
+            featuredIsStale = result.isStale
         } catch {
-            if !isShowingProducts { state = .failed }
+            if isShowingProducts {
+                featuredIsStale = true
+            } else {
+                state = .failed
+            }
         }
     }
 
@@ -57,7 +66,7 @@ final class HomeViewModel {
             let list = try await getCategories.execute()
             categories = list.isEmpty ? .hidden : .loaded(list)
         } catch {
-            if !isShowingCategories { categories = .hidden }
+            if !isShowingCategories { categories = .failed }
         }
     }
 }

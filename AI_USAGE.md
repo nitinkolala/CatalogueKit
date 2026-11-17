@@ -1,57 +1,62 @@
 # AI usage notes
 
-This file records how AI tools were used on this submission. It is a draft: items marked **[fill in]** need the author's own account before submission.
+How AI tools were used on this submission, and how the output was checked. Items marked **[fill in]** need the author's own account before submission.
 
 ## 1. Tools and models
 
 | Tool | Used for | Model |
 | --- | --- | --- |
-| Claude Code (CLI and desktop app) | Planning, reading the brief, generating and editing backend and iOS code, writing these documents | Claude Haiku 5.5 (`claude-haiku-5-5`) for this session. [fill in any other sessions and models] |
-| [fill in any other tools, e.g. Xcode, Cursor, Copilot] | [fill in] | [fill in] |
+| Claude Code (CLI and desktop app) | Reading the brief, planning, generating and editing backend and iOS code, tests, and these documents | Claude Haiku 5.5 (`claude-haiku-5-5`) for the session that did the final audit. [fill in: any other sessions and their models] |
+| Xcode and the iOS Simulator | Building, running the app, and checking screens | Not AI. Used to verify the AI's output. |
+| [fill in: any other tools, e.g. Cursor or Copilot] | [fill in] | [fill in] |
 
-No paid service or account is needed to run the solution. The AI tools were used only at development time, not in the product.
+No paid service or account is needed to run the solution. AI tools were used only while building it, not inside the product.
 
 ## 2. Agent instruction files
 
 Committed to the repo:
 
-- **`CLAUDE.md`** at the repo root. It sets the stack (Swift and Swift Concurrency on iOS, Node.js only if a backend is added), the MVVM and Clean architecture rules, SOLID guidance, caching and environment rules, the no-hardcoding rule, the validator rules (strict email, exactly 10 digits for mobile), the testing expectations, and repo hygiene (no `xcuserdata/`, `DerivedData/` or signing values committed).
+- **`CLAUDE.md`** at the repo root. It sets the stack, the MVVM and Clean architecture rules, the SOLID guidance, the caching and environment rules, the no-hardcoding rule, the validator rules (strict email, exactly 10 digits for mobile), the testing expectations, and repo hygiene (no `xcuserdata/`, `DerivedData/` or signing values committed). Its "Current state" section now lists the real commands.
 
-The file was committed in three steps: `1172863` (initial architecture and rules), `04a11cc` (restored the init sections and added project rules) and `322e21d` (added the order flow testing rule). Those commits show the file evolving with the project.
+The file was committed in three steps: `1172863` (architecture and rules), `04a11cc` (restored the init sections and added project rules) and `322e21d` (added the testing rule). The history shows the file changing as the project did.
 
 No `AGENTS.md` or `.cursor/rules` file is in the repo.
 
 ## 3. Plan and spec
 
-- **The brief** is the source of truth for acceptance criteria. Its gaps are recorded as assumptions in [DECISIONS.md](DECISIONS.md), section 3.
-- **The plan** was kept as a task list during the session, not as a separate committed spec. The architecture decisions were written into `DECISIONS.md` section 2 and are reflected in `CLAUDE.md`.
+- **The brief** (`Documents/Code Challenge - AI-Native Engineer 1.pdf`) and **the acceptance criteria** (`Documents/User Acceptance Criteria.md`) are the source of truth. The gaps in them are recorded as assumptions in [DECISIONS.md](DECISIONS.md), section 3.
+- **The plan** was kept as a task list during the session, not as a separate committed spec. The architecture decisions are in `DECISIONS.md` section 2 and in `CLAUDE.md`.
 - [fill in: if you wrote a separate plan or spec file, link it here]
 
 ## 4. Key prompts and moments that shaped the solution
 
-These are candidates inferred from the commit history and the code, not verified prompt logs. [fill in: replace or confirm each one against your own prompts, and add the exact wording where you want to share it.]
+1. **Rules before code.** `CLAUDE.md` was written before any feature. That kept MVVM and Clean, protocol boundaries, and the no-hardcoding rule in place from the first file, rather than added afterwards.
+2. **A replaceable data source.** The brief says the product data source will change. A `ProductSource` interface on the backend, with the Fake Store mapping in one adapter, shaped the layers.
+3. **The backend as the only route to Fake Store.** The brief forbids direct client calls. `FakeStoreClient` sits behind `ProductService` and the HTTP layer, so the rule holds in code.
+4. **Build each feature, then test it in the Simulator, then fix.** Each feature (Home, categories, search, product page, enquiry) was run in the Simulator and fixed in a loop until it matched the acceptance criteria, rather than tested once at the end.
+5. **A criteria audit before submitting.** The request was to check every requirement in the brief, the criteria and `CLAUDE.md`, test each scenario, and fix what failed. It found the gaps listed in section 5.
 
-1. **Setting the architecture rules first.** The project began with `CLAUDE.md` before any code. That made the agent follow MVVM + Clean, protocol boundaries and the no-hardcoding rule from the first file onward, instead of retrofitting them.
-2. **Asking for a replaceable data source.** The brief says the product data source will change. Asking for a `ProductSource` interface on the backend, with the Fake Store mapping in one adapter, shaped the `domain/` and `data/` split.
-3. **Requesting the backend as the only route to Fake Store.** The brief forbids direct client calls. Keeping `FakeStoreClient` behind `ProductService` and the HTTP layer enforces that rule in code.
-4. **Asking for tests with each layer.** The backend has tests for ranking, the client mapping, the service, and the HTTP routes. The iOS side has tests for the repository, use case, view model and DTO mapping. [fill in: the prompt you used]
-5. **[fill in: a moment you changed direction, e.g. dropping the disk cache on the backend, or choosing iOS over web.]**
+[fill in: replace or confirm each item against your own prompts, and add the exact wording you want to share.]
 
 ## 5. Where the AI got something wrong, and how I caught it
 
-I have not yet recorded a verified case in this submission. [fill in with real examples. Good candidates to check:]
+Each of these was written by the AI, and caught by a test, a screen check, or a review against the criteria:
 
-- **Staged files that should not be committed.** `git status` shows `.DS_Store` files staged, and `CLAUDE.md` says not to commit that kind of file. This needs a fix before the PR. Fix: `git rm --cached .DS_Store Documents/.DS_Store`, then add a `.DS_Store` rule to `.gitignore` if one is missing.
-- **Duplicated configuration.** The featured count (5) and cache TTL (300 s) appear in both `backend/src/config/config.ts` and `ios/.../Core/Constants.swift`. This breaks `CLAUDE.md`'s no-hardcoding rule and could drift. Caught on review.
-- **[fill in: a bug the tests or a run caught, and what the AI had written.]**
+- **Oversized enquiry body returned 500, not 413.** The error handler did not map the body parser's "too large" error. Caught by sending a 20 KB body to `POST /enquiries`. Fixed in `backend/src/http/app.ts`, with a test.
+- **Required fields lost their "required" status for VoiceOver.** When the visible labels dropped "(required)", the spoken labels lost it too. Caught by checking criterion 30 in the audit. Fixed: each field now reads "required" or "optional".
+- **The featured count was in two places.** The iOS app capped Home at a hard-coded 5 as well as the backend's `FEATURED_COUNT`. Caught by the `CLAUDE.md` no-hardcoding rule. Fixed: the backend caps the list, and the app shows what it receives.
+- **A failed categories request hid the section silently.** Caught on the Simulator with the backend stopped. Fixed: the section shows a message and a retry. A stale-featured notice was added at the same time, using a flag that the repository now returns.
+- **The Message editor drew a black box in dark mode.** Caught on a dark-mode screenshot. Fixed by hiding the editor's own background.
+- **`.DS_Store` files were staged in an early commit.** Caught in `git status`. Fixed by unstaging them and excluding them from later commits.
+- **Stale documents.** The earlier notes in this file and in `DECISIONS.md` gave test counts and claims that no longer matched the code (for example, "phone required" and an SMTP catcher that was never built). Caught in the audit. Both documents were rewritten against the current code.
 
 ## 6. How I reviewed AI output
 
-- Read each generated file before committing, and checked it against `CLAUDE.md`.
-- Ran the iOS unit tests with `xcodebuild test -scheme CatalogueKit -only-testing:CatalogueKitTests` on the iPhone 17 Pro Simulator: 16 passed, 0 failed, on the first run with no changes needed.
-- Backend: `npm run typecheck` is clean and `npm test` passes 24 of 24 across 5 files, on Node 22.23.5, on the first run with no changes needed. Node was installed to `~/.local/node` from the official tarball, with its SHA-256 checked against Node's published SHASUMS file.
-- Built and ran the iOS app in the Simulator. [fill in: result]
-- Checked the acceptance criteria one by one against what the app does. [fill in: which ones are verified]
+- Read each generated file before committing, and checked it against `CLAUDE.md` and the acceptance criteria.
+- Backend: `npm test` runs 61 tests across 8 files, and `npm run typecheck` is clean. The enquiry and search endpoints were also run as a scenario matrix with curl: invalid and boundary inputs, malformed JSON, unknown products, oversized bodies, and encoded symbols.
+- iOS: `xcodebuild test` runs 106 unit tests on the iPhone 17 Pro Simulator, all passing.
+- Simulator checks: Home with live data; Home with the backend stopped (saved products with a notice, and a categories retry); recovery after the backend restarted; search failure with the typed text kept and a retry; the enquiry form with validation, the keyboard open and Submit working, and the thank-you screen; dark mode on the enquiry form.
+- Not verified: landscape, VoiceOver and larger text sizes on a device. The product page in dark mode was not checked on the Simulator.
 
 ## 7. Time spent
 

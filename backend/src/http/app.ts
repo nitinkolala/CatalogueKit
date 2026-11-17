@@ -19,6 +19,7 @@ export const ERROR_CODES = {
   invalidQuery: 'invalid_query',
   invalidEnquiry: 'invalid_enquiry',
   invalidJson: 'invalid_json',
+  payloadTooLarge: 'payload_too_large',
   upstreamUnavailable: 'upstream_unavailable',
   internal: 'internal_error',
 } as const;
@@ -27,6 +28,11 @@ export const ERROR_CODES = {
 function readIntParam(value: unknown, fallback: number, max = Number.MAX_SAFE_INTEGER): number {
   if (typeof value !== 'string' || !/^\d+$/.test(value)) return fallback;
   return Math.min(Number(value), max);
+}
+
+/** body-parser raises `entity.too.large` when a request body exceeds the configured limit. */
+function isBodyTooLarge(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'type' in error && error.type === 'entity.too.large';
 }
 
 export interface AppDeps {
@@ -151,6 +157,10 @@ export function createApp({ productService, featuredCount, enquiries }: AppDeps)
   app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     if (error instanceof SyntaxError && 'body' in error) {
       res.status(400).json({ error: { code: ERROR_CODES.invalidJson, message: 'Request body is not valid JSON' } });
+      return;
+    }
+    if (isBodyTooLarge(error)) {
+      res.status(413).json({ error: { code: ERROR_CODES.payloadTooLarge, message: 'Request body is too large' } });
       return;
     }
     if (error instanceof UpstreamError) {

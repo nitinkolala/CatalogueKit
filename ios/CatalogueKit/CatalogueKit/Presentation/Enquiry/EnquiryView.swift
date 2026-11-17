@@ -9,6 +9,7 @@ struct EnquiryView: View {
     @FocusState private var focus: EnquiryField?
     @State private var showDiscardConfirm = false
     @Environment(\.dismiss) private var dismiss
+    @ScaledMetric(relativeTo: .body) private var iconSize: CGFloat = Constants.Enquiry.iconSize
 
     private let quickPrompts = [
         L10n.enquiryPromptStock,
@@ -134,7 +135,7 @@ struct EnquiryView: View {
 
     private var detailsCard: some View {
         VStack(spacing: 0) {
-            fieldRow(.name, icon: "person.fill", label: L10n.enquiryNameLabel) {
+            fieldRow(.name, icon: "person.fill", label: L10n.enquiryNameLabel, required: true) {
                 TextField("", text: $viewModel.draft.name, onEditingChanged: { editing in
                     if !editing { viewModel.fieldDidEndEditing(.name) }
                 })
@@ -144,7 +145,7 @@ struct EnquiryView: View {
                 .onSubmit { focus = .email }
             }
             cardDivider
-            fieldRow(.email, icon: "envelope.fill", label: L10n.enquiryEmailLabel) {
+            fieldRow(.email, icon: "envelope.fill", label: L10n.enquiryEmailLabel, required: true) {
                 TextField("", text: $viewModel.draft.email, onEditingChanged: { editing in
                     if !editing { viewModel.fieldDidEndEditing(.email) }
                 })
@@ -156,7 +157,7 @@ struct EnquiryView: View {
                 .onSubmit { focus = .phone }
             }
             cardDivider
-            fieldRow(.phone, icon: "phone.fill", label: L10n.enquiryPhoneLabel) {
+            fieldRow(.phone, icon: "phone.fill", label: L10n.enquiryPhoneLabel, required: false) {
                 TextField("", text: $viewModel.draft.phone, onEditingChanged: { editing in
                     if !editing { viewModel.fieldDidEndEditing(.phone) }
                 })
@@ -170,7 +171,7 @@ struct EnquiryView: View {
     }
 
     private var messageCard: some View {
-        fieldRow(.message, icon: "text.bubble.fill", label: L10n.enquiryMessageLabel) {
+        fieldRow(.message, icon: "text.bubble.fill", label: L10n.enquiryMessageLabel, required: true) {
             VStack(alignment: .leading, spacing: Constants.Enquiry.chipSpacing) {
                 ZStack(alignment: .topLeading) {
                     if viewModel.draft.message.isEmpty {
@@ -180,6 +181,7 @@ struct EnquiryView: View {
                             .allowsHitTesting(false)
                     }
                     TextEditor(text: $viewModel.draft.message)
+                        .scrollContentBackground(.hidden)
                         .padding(.leading, -Constants.Enquiry.editorInset)
                         .frame(minHeight: Constants.Enquiry.messageMinHeight)
                 }
@@ -217,14 +219,17 @@ struct EnquiryView: View {
         _ field: EnquiryField,
         icon: String,
         label: String,
+        required: Bool,
         @ViewBuilder content: () -> Content
     ) -> some View {
+        let spokenLabel = "\(label), \(required ? L10n.enquiryRequiredSuffix : L10n.enquiryOptionalSuffix)"
         let error = viewModel.errorText(for: field)
         return HStack(alignment: .top, spacing: Constants.Enquiry.rowSpacing) {
+            // Decorative icon. It scales with the text, and its frame scales with it, so it never overlaps the label.
             Image(systemName: icon)
-                .font(.body)
+                .font(.system(size: iconSize))
                 .foregroundStyle(error == nil ? Color.secondary : Color.red)
-                .frame(width: Constants.Enquiry.iconSize)
+                .frame(width: iconSize)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
@@ -232,7 +237,7 @@ struct EnquiryView: View {
                     .foregroundStyle(error == nil ? Color.secondary : Color.red)
                 content()
                     .focused($focus, equals: field)
-                    .accessibilityLabel(label)
+                    .accessibilityLabel(spokenLabel)
                 if let error {
                     Text(error)
                         .font(.footnote)
@@ -260,6 +265,9 @@ struct EnquiryView: View {
                 }
                 Text(submitTitle)
                     .font(.body.bold())
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
         }
