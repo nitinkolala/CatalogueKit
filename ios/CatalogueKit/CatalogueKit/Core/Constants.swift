@@ -15,6 +15,8 @@ nonisolated enum Constants {
     }
 
     enum Home {
+        /// How long Home keeps its data before it reloads on the next appearance.
+        static let refreshInterval: TimeInterval = 24 * 60 * 60
         static let gridSpacing: CGFloat = 16
         static let gridMinimumWidth: CGFloat = 160
         static let featuredCardWidth: CGFloat = 185

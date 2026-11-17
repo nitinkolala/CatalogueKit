@@ -14,10 +14,28 @@ final class HomeViewModelTests: XCTestCase {
     private final class ScriptedFeaturedUseCase: GetFeaturedProductsUseCase, @unchecked Sendable {
         var result: Result<[Product], Error>
         var isStale = false
+        private(set) var calls = 0
         init(_ result: Result<[Product], Error>) { self.result = result }
         func execute(forceRefresh: Bool) async throws -> FeaturedProducts {
-            FeaturedProducts(items: try result.get(), isStale: isStale)
+            calls += 1
+            return FeaturedProducts(items: try result.get(), isStale: isStale)
         }
+    }
+
+    /// A clock the tests move forward by hand.
+    private final class FakeClock {
+        var now = Date(timeIntervalSince1970: 1_000_000)
+    }
+
+    private func homeViewModel(
+        featured: ScriptedFeaturedUseCase,
+        clock: FakeClock
+    ) -> HomeViewModel {
+        HomeViewModel(
+            getFeaturedProducts: featured,
+            getCategories: FixedCategoriesUseCase(result: .success([])),
+            now: { clock.now }
+        )
     }
 
     private struct FixedCategoriesUseCase: GetCategoriesUseCase {
@@ -134,5 +152,161 @@ final class HomeViewModelTests: XCTestCase {
         featured.result = .success(products)
         await viewModel.load(forceRefresh: true)
         XCTAssertFalse(viewModel.featuredIsStale)
+    }
+
+    func testFirstAppearanceLoads() async {
+        let featured = ScriptedFeaturedUseCase(.success([TestData.product(id: 1)]))
+        let viewModel = homeViewModel(featured: featured, clock: FakeClock())
+
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(featured.calls, 1)
+        XCTAssertEqual(viewModel.state, .loaded([TestData.product(id: 1)]))
+    }
+
+    func testReappearingWithinADayDoesNotReload() async {
+        let featured = ScriptedFeaturedUseCase(.success([TestData.product(id: 1)]))
+        let clock = FakeClock()
+        let viewModel = homeViewModel(featured: featured, clock: clock)
+        await viewModel.loadIfNeeded()
+
+        clock.now.addTimeInterval(Constants.Home.refreshInterval - 1)
+        await viewModel.loadIfNeeded()
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(featured.calls, 1)
+    }
+
+    func testReloadsOnceADayHasPassed() async {
+        let featured = ScriptedFeaturedUseCase(.success([TestData.product(id: 1)]))
+        let clock = FakeClock()
+        let viewModel = homeViewModel(featured: featured, clock: clock)
+        await viewModel.loadIfNeeded()
+
+        clock.now.addTimeInterval(Constants.Home.refreshInterval)
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(featured.calls, 2)
+    }
+
+    func testFailedLoadIsRetriedOnNextAppearance() async {
+        let featured = ScriptedFeaturedUseCase(.failure(StubError.offline))
+        let clock = FakeClock()
+        let viewModel = homeViewModel(featured: featured, clock: clock)
+        await viewModel.loadIfNeeded()
+        XCTAssertEqual(viewModel.state, .failed)
+
+        featured.result = .success([TestData.product(id: 1)])
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(featured.calls, 2)
+        XCTAssertEqual(viewModel.state, .loaded([TestData.product(id: 1)]))
+    }
+
+    func testPullToRefreshAlwaysFetchesEvenWithinADay() async {
+        let featured = ScriptedFeaturedUseCase(.success([TestData.product(id: 1)]))
+        let clock = FakeClock()
+        let viewModel = homeViewModel(featured: featured, clock: clock)
+        await viewModel.loadIfNeeded()
+
+        await viewModel.load(forceRefresh: true)
+
+        XCTAssertEqual(featured.calls, 2)
+    }
+
+    func testFailedRefreshDoesNotResetTheDailyClock() async {
+        let featured = ScriptedFeaturedUseCase(.success([TestData.product(id: 1)]))
+        let clock = FakeClock()
+        let viewModel = homeViewModel(featured: featured, clock: clock)
+        await viewModel.loadIfNeeded()
+
+        clock.now.addTimeInterval(Constants.Home.refreshInterval / 2)
+        featured.result = .failure(StubError.offline)
+        await viewModel.load(forceRefresh: true)
+        XCTAssertEqual(viewModel.state, .loaded([TestData.product(id: 1)]))
+
+        clock.now.addTimeInterval(Constants.Home.refreshInterval / 2)
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(featured.calls, 3)
+    }
+
+    /// Products that finish loading after the task was cancelled. It cancels its own task, then answers.
+    private struct SelfCancellingFeaturedUseCase: GetFeaturedProductsUseCase {
+        let items: [Product]
+        func execute(forceRefresh: Bool) async throws -> FeaturedProducts {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return FeaturedProducts(items: items, isStale: false)
+        }
+    }
+
+    private final class CountingCategoriesUseCase: GetCategoriesUseCase, @unchecked Sendable {
+        private(set) var calls = 0
+        func execute() async throws -> [ProductCategory] {
+            calls += 1
+            return [ProductCategory(name: "jewelery")]
+        }
+    }
+
+    func testCancelledFirstLoadReturnsToIdleAndLoadsAgainOnNextAppearance() async {
+        let featured = ScriptedFeaturedUseCase(.failure(CancellationError()))
+        let clock = FakeClock()
+        let viewModel = homeViewModel(featured: featured, clock: clock)
+
+        await viewModel.loadIfNeeded()
+        XCTAssertEqual(viewModel.state, .idle, "A cancelled load must not show the failed state")
+
+        featured.result = .success([TestData.product(id: 1)])
+        await viewModel.loadIfNeeded()
+
+        XCTAssertEqual(featured.calls, 2)
+        XCTAssertEqual(viewModel.state, .loaded([TestData.product(id: 1)]))
+    }
+
+    func testCancelledRefreshKeepsProductsWithoutStaleNotice() async {
+        let products = [TestData.product(id: 1)]
+        let featured = ScriptedFeaturedUseCase(.success(products))
+        let viewModel = homeViewModel(featured: featured, clock: FakeClock())
+        await viewModel.load()
+
+        featured.result = .failure(CancellationError())
+        await viewModel.load(forceRefresh: true)
+
+        XCTAssertEqual(viewModel.state, .loaded(products))
+        XCTAssertFalse(viewModel.featuredIsStale, "Cancelling is not a failed refresh, so no notice")
+    }
+
+    func testCancelledLoadStopsBeforeCategoriesAreRequested() async {
+        let categories = CountingCategoriesUseCase()
+        let viewModel = HomeViewModel(
+            getFeaturedProducts: SelfCancellingFeaturedUseCase(items: [TestData.product(id: 1)]),
+            getCategories: categories
+        )
+
+        await Task { await viewModel.load() }.value
+
+        XCTAssertEqual(categories.calls, 0)
+        XCTAssertEqual(viewModel.categories, .loading)
+    }
+
+    func testCancelledCategoriesRequestRestoresThePreviousState() async {
+        let categories = ScriptedCategoriesUseCase(.failure(StubError.offline))
+        let viewModel = HomeViewModel(
+            getFeaturedProducts: FixedUseCase(result: .success([TestData.product(id: 1)])),
+            getCategories: categories
+        )
+        await viewModel.load()
+        XCTAssertEqual(viewModel.categories, .failed)
+
+        categories.result = .failure(CancellationError())
+        await viewModel.load(forceRefresh: true)
+
+        XCTAssertEqual(viewModel.categories, .failed, "A cancelled retry must keep the retry option, not spin forever")
+    }
+
+    private final class ScriptedCategoriesUseCase: GetCategoriesUseCase, @unchecked Sendable {
+        var result: Result<[ProductCategory], Error>
+        init(_ result: Result<[ProductCategory], Error>) { self.result = result }
+        func execute() async throws -> [ProductCategory] { try result.get() }
     }
 }

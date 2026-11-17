@@ -52,7 +52,7 @@ struct HomeView: View {
                 .navigationDestination(for: AppRoute.self) { route in
                     destination(for: route)
                 }
-                .task { await viewModel.load() }
+                .task { await viewModel.loadIfNeeded() }
         }
     }
 
