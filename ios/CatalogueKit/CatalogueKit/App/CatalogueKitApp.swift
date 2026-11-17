@@ -16,7 +16,8 @@ struct CatalogueKitApp: App {
                     search: container.homeSearchViewModel,
                     imageLoader: container.imageLoader,
                     makeCategoryViewModel: container.makeCategoryViewModel,
-                    makeCategorySearchViewModel: container.makeCategorySearchViewModel
+                    makeCategorySearchViewModel: container.makeCategorySearchViewModel,
+                    makeProductDetailViewModel: container.makeProductDetailViewModel
                 )
             } else {
                 Text(L10n.homeLoadFailed)

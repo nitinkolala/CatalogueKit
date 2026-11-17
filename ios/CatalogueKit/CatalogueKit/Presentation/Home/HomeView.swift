@@ -8,19 +8,22 @@ struct HomeView: View {
     private let imageLoader: ImageLoader
     private let makeCategoryViewModel: (ProductCategory) -> CategoryViewModel
     private let makeCategorySearchViewModel: (ProductCategory) -> ProductSearchViewModel
+    private let makeProductDetailViewModel: (Product) -> ProductDetailViewModel
 
     init(
         viewModel: HomeViewModel,
         search: ProductSearchViewModel,
         imageLoader: ImageLoader,
         makeCategoryViewModel: @escaping (ProductCategory) -> CategoryViewModel,
-        makeCategorySearchViewModel: @escaping (ProductCategory) -> ProductSearchViewModel
+        makeCategorySearchViewModel: @escaping (ProductCategory) -> ProductSearchViewModel,
+        makeProductDetailViewModel: @escaping (Product) -> ProductDetailViewModel
     ) {
         _viewModel = State(initialValue: viewModel)
         _search = State(initialValue: search)
         self.imageLoader = imageLoader
         self.makeCategoryViewModel = makeCategoryViewModel
         self.makeCategorySearchViewModel = makeCategorySearchViewModel
+        self.makeProductDetailViewModel = makeProductDetailViewModel
     }
 
     var body: some View {
@@ -54,7 +57,10 @@ struct HomeView: View {
     private func destination(for route: AppRoute) -> some View {
         switch route {
         case .product(let product):
-            ProductDetailView(product: product, imageLoader: imageLoader)
+            ProductDetailView(
+                viewModel: makeProductDetailViewModel(product),
+                imageLoader: imageLoader
+            )
         case .category(let category):
             CategoryView(
                 viewModel: makeCategoryViewModel(category),

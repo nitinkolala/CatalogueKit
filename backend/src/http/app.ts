@@ -90,6 +90,24 @@ export function createApp({ productService, featuredCount }: AppDeps) {
     }
   });
 
+  app.get(`${ROUTES.products}/:id`, async (req, res, next) => {
+    const id = /^\d+$/.test(req.params.id) ? Number(req.params.id) : undefined;
+    if (id === undefined) {
+      res.status(404).json({ error: { code: ERROR_CODES.notFound, message: 'Product not found' } });
+      return;
+    }
+    try {
+      const product = await productService.productById(id);
+      if (!product) {
+        res.status(404).json({ error: { code: ERROR_CODES.notFound, message: 'Product not found' } });
+        return;
+      }
+      res.json({ item: product });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.get(ROUTES.products, async (_req, res, next) => {
     try {
       res.json({ items: await productService.listProducts() });

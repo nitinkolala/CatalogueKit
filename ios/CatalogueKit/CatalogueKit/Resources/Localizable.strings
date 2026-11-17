@@ -28,3 +28,19 @@
 "search.failed" = "Search failed. Check your connection and try again.";
 "search.result_count_one" = "1 result";
 "search.result_count_other" = "%d results";
+
+/* Product page */
+"product.in_stock" = "In stock";
+"product.show_more" = "Show more";
+"product.show_less" = "Show less";
+"product.specifications" = "Specifications";
+"product.spec_category" = "Category";
+"product.spec_id" = "Product ID";
+"product.spec_rating" = "Rating";
+"product.spec_availability" = "Availability";
+"product.reviews" = "Reviews";
+"product.not_found" = "We couldn't find this product. It may have been removed.";
+"product.back" = "Back";
+"product.offline" = "You're offline. Showing the last details you loaded.";
+"product.load_failed" = "We couldn't refresh this product. Check your connection and try again.";
+"product.image_label" = "Image %1$d of %2$d for %3$@";

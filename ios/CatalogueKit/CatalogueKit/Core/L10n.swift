@@ -24,6 +24,24 @@ nonisolated enum L10n {
     static let searchOffline = String(localized: "search.offline")
     static let searchFailed = String(localized: "search.failed")
 
+    static let productInStock = String(localized: "product.in_stock")
+    static let productShowMore = String(localized: "product.show_more")
+    static let productShowLess = String(localized: "product.show_less")
+    static let productSpecifications = String(localized: "product.specifications")
+    static let productSpecCategory = String(localized: "product.spec_category")
+    static let productSpecId = String(localized: "product.spec_id")
+    static let productSpecRating = String(localized: "product.spec_rating")
+    static let productSpecAvailability = String(localized: "product.spec_availability")
+    static let productReviews = String(localized: "product.reviews")
+    static let productNotFound = String(localized: "product.not_found")
+    static let productBack = String(localized: "product.back")
+    static let productOffline = String(localized: "product.offline")
+    static let productLoadFailed = String(localized: "product.load_failed")
+
+    static func productImageLabel(_ name: String, _ index: Int, _ total: Int) -> String {
+        String(format: String(localized: "product.image_label"), index, total, name)
+    }
+
     static func searchNoMatches(_ term: String) -> String {
         String(format: String(localized: "search.no_matches"), term)
     }

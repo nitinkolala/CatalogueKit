@@ -93,3 +93,39 @@
 25. VoiceOver and TalkBack read the name, price, rating, and stock status in a sensible order.
 26. Each gallery image has a text description for screen readers.
 27. Share, when used, opens the system share sheet with the product name and link.
+
+## Enquiry
+
+1. The Enquire button is on the Product page and is visible without scrolling.
+2. Tapping Enquire opens the Enquiry page for that product. The product name is shown at the top so the customer knows what they are enquiring about.
+3. The enquiry is linked to the product ID, so the sales email includes the product name and link.
+4. The customer can open the form without signing in.
+5. Required fields are name, email, and message. Phone is optional, but if entered it must be valid.
+6. Each field has a visible label. Placeholder text is not used as the label.
+7. Email is validated with the app's strict email validator, not a simple "contains @" check.
+8. Phone is validated as exactly 10 digits after formatting characters are removed.
+9. Validation runs when the customer leaves a field, and again when they submit. Errors are shown under the field in text, not only in colour.
+10. The Submit button is disabled until the required fields are valid.
+11. When the customer submits with errors, the screen scrolls to the first error and focuses that field.
+12. The message field accepts a set maximum length (for example 1,000 characters), with a counter shown near the limit.
+13. Leading and trailing spaces are trimmed before validation and sending.
+14. Each field uses the right keyboard: email for email, phone pad for phone, and standard text for name and message.
+15. Pressing Return moves to the next field. Pressing Return in the last field does not submit by accident.
+16. The keyboard does not hide the field the customer is typing in or the Submit button.
+17. Autocorrect and auto-capitalisation are set sensibly for each field (no autocorrect on email).
+18. Tapping Submit shows a loading state on the button, and the button cannot be tapped again until the request ends.
+19. A successful submit shows the "Thank you" message on screen, and the sales inbox receives the email.
+20. After a successful submit, the form clears and cannot be sent again from the same screen by accident.
+21. A failed submit shows a clear message and keeps everything the customer typed.
+22. With no network, the message says so, and the typed content is kept.
+23. The customer can retry without re-entering their details.
+24. If the customer has typed something and taps back or cancel, they are asked to confirm before losing the text.
+25. After the thank-you message, the customer can return to the product page.
+26. The form shows a short privacy notice and a link to the privacy policy.
+27. If marketing consent is included, it is an unticked checkbox that the customer chooses. It is not pre-ticked.
+28. The form fits the phone width, with no sideways scrolling, and text stays readable at larger text sizes.
+29. Touch targets, including the Submit button and checkbox, are at least 44 pt.
+30. VoiceOver and TalkBack read each field's label, the required status, and any error message.
+31. Error and success messages are announced to screen readers.
+32. Dark mode keeps text, field borders, and error states readable.
+33. The form works in portrait and landscape.

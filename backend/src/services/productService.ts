@@ -31,6 +31,11 @@ export class ProductService {
     return products;
   }
 
+  /** One product by id, or `undefined` when the catalogue has no product with that id. */
+  async productById(id: number): Promise<Product | undefined> {
+    return (await this.listProducts()).find((product) => product.id === id);
+  }
+
   /** Every category in the catalogue, sorted. Derived from the cached product list. */
   async categories(): Promise<string[]> {
     return distinctCategories(await this.listProducts());

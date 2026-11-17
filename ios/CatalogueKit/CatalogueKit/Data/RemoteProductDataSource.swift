@@ -47,6 +47,14 @@ nonisolated struct RemoteProductDataSource: Sendable {
         return try page.toDomain()
     }
 
+    /// Fetches one product. A missing product comes back as HTTP 404, which the repository maps to "not found".
+    func product(id: Int) async throws -> Product {
+        let url = baseURL.appending(path: "products").appending(path: String(id))
+        let data = try await client.data(from: url)
+        let item = try JSONDecoder().decode(ProductItemDTO.self, from: data)
+        return try item.item.toDomain()
+    }
+
     func categoryProducts(_ category: ProductCategory) async throws -> CategoryProducts {
         let url = baseURL.appending(path: Path.categories).appending(path: category.name)
         let data = try await client.data(from: url)

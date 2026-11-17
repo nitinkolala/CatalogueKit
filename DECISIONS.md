@@ -35,7 +35,7 @@ View -> ViewModel -> UseCase   ->  Express route -> ProductService  ->  ProductS
 | A2 | "I have chosen 5 products" | The entrepreneur's choice is approximated by the top 5 by rating. There is no admin UI to pin products. The count is configurable with `FEATURED_COUNT`. | `config.ts`, `productService.ts` |
 | A3 | Category page | Categories come from the Fake Store `category` field. The category page shows the top-rated products first, then the rest of that category. Pagination is planned, not built. | Planned |
 | A4 | Search | Search is a case-insensitive substring match on title and description. An empty term shows the full list. Search runs on the backend, so results come from the same data source. | Planned |
-| A5 | Product page | Opening a tile shows title, image, price, rating, category and description. A product that is not found shows an error state. | Planned |
+| A5 | Product page | Opening a tile shows the name, image, price, rating, stock status, description and specifications. A product that is not found shows a not-found page with a Back button. Details are in the "Product page rules" table in section 4. | Built |
 | A6 | Enquiry | The form captures name, email, phone and a message. Email is required and validated with a strict pattern. Phone is required and must be exactly 10 digits after stripping spaces and punctuation, per the `MobileValidator` rule in `CLAUDE.md`. This assumes an Australian-style number, which fits the retailer context. | Planned |
 | A7 | Sales inbox | The recipient address is configured with an env variable. Email is sent through an `EmailSender` interface. The PoC adapter writes to the log and to a local SMTP catcher. A real provider can be added later. No paid email account is needed to run the solution. | Planned |
 | A8 | "Thank you" | After the backend accepts the enquiry, the client shows a thank-you screen. A failed send shows an error and keeps the form contents. | Planned |
@@ -54,6 +54,22 @@ View -> ViewModel -> UseCase   ->  Express route -> ProductService  ->  ProductS
 | Infrastructure (AWS) | **Not included.** | Not required for the PoC. Any future infrastructure must stay AWS-compatible (challenge constraint 3). |
 | Authentication | **Not included.** | Not in the acceptance criteria. Enquiries are anonymous. |
 | Product metadata quality | **Not improved.** Fake Store data is used as-is. | The brief says metadata is not important yet. |
+
+### Product page rules the data source cannot support
+
+The Product page acceptance criteria assume data that Fake Store does not provide. These rules are handled as follows:
+
+| Rule | What is built | Why the rest is not built |
+| --- | --- | --- |
+| 6. Gallery with page indicator | Swipeable gallery and pinch zoom (zoom stays until a double tap). The page indicator appears only when there is more than one image. | Fake Store gives one image per product, so the indicator never shows. |
+| 7. Discount with struck-through price | Price and currency only. | No original-price or discount field exists. |
+| 10. "Low stock" status | "In stock" and "Out of stock", both with an icon and text. | Fake Store has no stock quantity, so "Low stock" cannot be derived. |
+| 12. Specifications list | Category, product ID and rating rows, with long values wrapping. | Fake Store has no specification data. |
+| 13. Reviews with full list on demand | Average and review count shown in the summary line. | Fake Store has no individual reviews. |
+| 27. Share | Not built. | There is no product link to share. |
+| 4. Android back gesture | Not applicable. | This is an iOS build. The iOS swipe-from-left-edge back gesture works. |
+
+Rules built with a backend change: `GET /products/:id` returns one product and 404 for an unknown id. The product page keeps the product the customer tapped on screen, reloads it, and keeps the content if the reload fails. A product that no longer exists shows a not-found page with a Back button.
 
 ## 5. How the design supports growth beyond the PoC
 

@@ -44,6 +44,22 @@ nonisolated enum Constants {
         static let code = "USD"
     }
 
+    enum Layout {
+        /// Minimum tap target for any control, in points.
+        static let minTouchTarget: CGFloat = 44
+    }
+
+    enum ProductPage {
+        /// Lines shown before a long description is collapsed behind "Show more".
+        static let descriptionCollapsedLines = 4
+        /// Descriptions longer than this many characters get a "Show more" control.
+        static let descriptionCollapseLength = 160
+        /// Largest zoom factor a pinch can reach on a gallery image.
+        static let maxZoom: CGFloat = 4
+        static let sectionSpacing: CGFloat = 20
+        static let statusBadgeSpacing: CGFloat = 6
+    }
+
     enum Search {
         static let minLength = 2
         static let maxLength = 100

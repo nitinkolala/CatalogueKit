@@ -9,6 +9,7 @@ final class AppContainer {
     let homeSearchViewModel: ProductSearchViewModel
     let makeCategoryViewModel: (ProductCategory) -> CategoryViewModel
     let makeCategorySearchViewModel: (ProductCategory) -> ProductSearchViewModel
+    let makeProductDetailViewModel: (Product) -> ProductDetailViewModel
 
     init(environment: AppEnvironment = .current) throws {
         self.environment = environment
@@ -40,6 +41,12 @@ final class AppContainer {
         )
         self.makeCategoryViewModel = { category in
             CategoryViewModel(category: category, getCategoryProducts: getCategoryProducts)
+        }
+        let getProductDetail = DefaultGetProductDetailUseCase(
+            repository: RemoteProductDetailRepository(remote: remote)
+        )
+        self.makeProductDetailViewModel = { product in
+            ProductDetailViewModel(product: product, getProductDetail: getProductDetail)
         }
         self.makeCategorySearchViewModel = { category in
             ProductSearchViewModel(

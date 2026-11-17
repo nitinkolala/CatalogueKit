@@ -148,6 +148,25 @@ describe('HTTP API', () => {
     expect(res.body.items.map((p: Product) => p.id)).toEqual([1]);
   });
 
+  it('GET /products/:id returns the product with that id', async () => {
+    const source: ProductSource = { fetchProducts: async () => [product(1, 1), product(7, 4)] };
+    const res = await request(appWith(source)).get(`${ROUTES.products}/7`);
+    expect(res.status).toBe(200);
+    expect(res.body.item.id).toBe(7);
+  });
+
+  it('GET /products/:id returns 404 for an unknown id', async () => {
+    const source: ProductSource = { fetchProducts: async () => [product(1, 1)] };
+    const res = await request(appWith(source)).get(`${ROUTES.products}/99`);
+    expect(res.status).toBe(404);
+    expect(res.body.error.code).toBe(ERROR_CODES.notFound);
+  });
+
+  it('GET /products/:id returns 404 for a non-numeric id', async () => {
+    const res = await request(appWith({ fetchProducts: async () => [product(1, 1)] })).get(`${ROUTES.products}/abc`);
+    expect(res.status).toBe(404);
+  });
+
   it('returns 404 with a JSON error for unknown routes', async () => {
     const res = await request(appWith({ fetchProducts: async () => [] })).get('/nope');
     expect(res.status).toBe(404);
