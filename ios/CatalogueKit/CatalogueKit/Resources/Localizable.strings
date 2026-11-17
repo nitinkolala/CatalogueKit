@@ -54,7 +54,7 @@
 "enquiry.marketing" = "Send me offers and news about this range";
 "enquiry.privacy" = "We use your details only to answer this enquiry.";
 "enquiry.privacy_link" = "Read our privacy policy";
-"enquiry.submit" = "Submit enquiry";
+"enquiry.submit" = "Submit";
 "enquiry.sent_title" = "Thank you";
 "enquiry.sent_body" = "Your enquiry has been sent. We will be in touch soon.";
 "enquiry.back_to_product" = "Back to product";
@@ -81,6 +81,5 @@
 "enquiry.prompt_delivery" = "What are the delivery options?";
 "enquiry.prompt_warranty" = "What does the warranty cover?";
 "enquiry.message_placeholder" = "Tell us what you would like to know";
-"enquiry.missing" = "Add %@";
 "home.categories_load_failed" = "Categories couldn't load.";
 "home.featured_stale" = "Couldn't refresh. Showing saved products.";

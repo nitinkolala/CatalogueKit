@@ -74,10 +74,6 @@ nonisolated enum L10n {
     static let enquiryPromptWarranty = String(localized: "enquiry.prompt_warranty")
     static let enquiryMessagePlaceholder = String(localized: "enquiry.message_placeholder")
 
-    static func enquiryMissing(_ fields: String) -> String {
-        String(format: String(localized: "enquiry.missing"), fields)
-    }
-
     static func enquiryCounter(_ count: Int, _ limit: Int) -> String {
         String(format: String(localized: "enquiry.counter"), count, limit)
     }

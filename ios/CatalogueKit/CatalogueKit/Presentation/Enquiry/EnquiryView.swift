@@ -263,11 +263,8 @@ struct EnquiryView: View {
                 if viewModel.isSubmitting {
                     ProgressView()
                 }
-                Text(submitTitle)
+                Text(L10n.enquirySubmit)
                     .font(.body.bold())
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-                    .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
         }
@@ -278,21 +275,6 @@ struct EnquiryView: View {
         .padding(Constants.Home.gridSpacing)
         .frame(maxWidth: .infinity)
         .background(Color(.systemGroupedBackground))
-    }
-
-    private var submitTitle: String {
-        let missing = viewModel.missingRequiredFields
-        guard !viewModel.canSubmit, !missing.isEmpty else { return L10n.enquirySubmit }
-        return L10n.enquiryMissing(missing.map(Self.title(for:)).joined(separator: ", "))
-    }
-
-    private static func title(for field: EnquiryField) -> String {
-        switch field {
-        case .name: return L10n.enquiryNameLabel
-        case .email: return L10n.enquiryEmailLabel
-        case .phone: return L10n.enquiryPhoneLabel
-        case .message: return L10n.enquiryMessageLabel
-        }
     }
 
     private func failureBanner(_ error: EnquiryError) -> some View {

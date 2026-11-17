@@ -75,7 +75,7 @@ Rules built with a backend change: `GET /products/:id` returns one product, and 
 ### Enquiry rules: decisions and limits
 
 - **Sales email.** The backend builds the email and sends it through `EmailSender`. The only adapter is `LogEmailSender`. A real provider (for example Amazon SES) is a new adapter.
-- **Submit and errors.** Submit is enabled once name, email and message are valid. An invalid phone still lets the customer submit, so the form shows the error and scrolls to the phone field. While Submit is disabled, its label says what is missing, for example "Add Email, Message".
+- **Submit and errors.** Submit is enabled only when every field is valid: name, email and message are filled in, and a phone number, if typed, is 10 digits. Any error keeps Submit disabled. The label is always "Submit".
 - **Return key.** Name and email move to the next field on Return. Phone and message use the keyboard's Done button, because a phone pad has no Return key and a message needs Return for new lines. The keyboard's Done button only appears for those two fields.
 - **Back and Cancel.** Back asks to confirm before discarding typed text. The system back button is hidden. The edge swipe that leaves the page is not intercepted, so a swipe can leave without the prompt.
 - **Privacy policy.** The link points to `https://example.com/privacy`, a placeholder until the client's policy URL is known.

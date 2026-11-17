@@ -44,20 +44,15 @@ final class EnquiryViewModel {
         self.announce = announce
     }
 
-    /// Enabled once name, email and message are valid. A typed but invalid phone number still lets the customer
-    /// submit, so the form can show the error and scroll to it.
+    /// Enabled only when every field is valid. A required field that is empty, or any field with a format error
+    /// (including a phone number that was typed but is not 10 digits), keeps Submit disabled.
     var canSubmit: Bool {
-        draft.requiredFieldsAreFilled && phase != .submitting && phase != .sent
+        draft.firstIssueField == nil && phase != .submitting && phase != .sent
     }
 
     var isSubmitting: Bool { phase == .submitting }
 
     var hasUnsavedInput: Bool { draft.hasAnyText && phase != .sent }
-
-    /// Required fields that still need a valid value, in form order. The form uses this to say what is missing.
-    var missingRequiredFields: [EnquiryField] {
-        [EnquiryField.name, .email, .message].filter { draft.issue(for: $0) != nil }
-    }
 
     /// A quick question fills the message. If text is already there, it is added on a new line, not repeated.
     func applyQuickPrompt(_ text: String) {

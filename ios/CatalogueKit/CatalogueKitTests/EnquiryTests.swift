@@ -118,18 +118,6 @@ final class EnquiryViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.canSubmit)
     }
 
-    func testMissingRequiredFieldsListsOnlyEmptyOrInvalidRequiredFields() {
-        let viewModel = makeViewModel()
-        XCTAssertEqual(viewModel.missingRequiredFields, [.name, .email, .message])
-
-        viewModel.draft.name = "Sam Lee"
-        viewModel.draft.email = "bad"
-        XCTAssertEqual(viewModel.missingRequiredFields, [.email, .message])
-
-        fillValid(viewModel)
-        viewModel.draft.phone = "12"
-        XCTAssertEqual(viewModel.missingRequiredFields, [])
-    }
 
     func testQuickPromptFillsAnEmptyMessage() {
         let viewModel = makeViewModel()
@@ -166,17 +154,26 @@ final class EnquiryViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.phase, .editing)
     }
 
-    func testInvalidPhoneStillLetsTheCustomerSubmitAndFocusesPhone() async {
+    func testInvalidPhoneKeepsSubmitDisabledAndNeverSends() async {
         let recorder = Recorder()
         let viewModel = makeViewModel(recorder: recorder)
         fillValid(viewModel)
         viewModel.draft.phone = "12"
-        XCTAssertTrue(viewModel.canSubmit)
+        XCTAssertFalse(viewModel.canSubmit, "a format error disables Submit")
 
         await viewModel.submit()
 
         XCTAssertEqual(viewModel.pendingFocus, .phone)
         XCTAssertTrue(recorder.requests.isEmpty)
+    }
+
+    func testAnyFormatErrorDisablesSubmit() {
+        let viewModel = makeViewModel()
+        fillValid(viewModel)
+        XCTAssertTrue(viewModel.canSubmit)
+
+        viewModel.draft.email = "not-an-email"
+        XCTAssertFalse(viewModel.canSubmit, "an invalid email disables Submit")
     }
 
     func testSuccessSendsTrimmedValuesAndClearsTheForm() async {
