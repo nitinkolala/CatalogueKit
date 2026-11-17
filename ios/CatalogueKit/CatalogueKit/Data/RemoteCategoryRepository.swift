@@ -1,6 +1,7 @@
 import Foundation
 
-/// Category repository backed by the catalogue backend. No local cache yet; each call asks the backend.
+/// Category repository backed by the catalogue backend. Each call asks the backend;
+/// `CachingCategoryRepository` wraps it to add the saved copy.
 nonisolated struct RemoteCategoryRepository: CategoryRepository {
     let remote: RemoteProductDataSource
 

@@ -19,7 +19,15 @@ final class AppContainer {
         let remote = RemoteProductDataSource(client: httpClient, baseURL: environment.baseURL)
         let cache = ProductsDiskCache(fileURL: try ProductsDiskCache.defaultFileURL())
         let repository = FeaturedProductsRepository(remote: remote, cache: cache)
-        let categoryRepository = RemoteCategoryRepository(remote: remote)
+        let categoryRepository = CachingCategoryRepository(
+            remote: RemoteCategoryRepository(remote: remote),
+            categoriesCache: KeyedDiskCache(
+                fileURL: try KeyedDiskCache<[ProductCategory]>.defaultFileURL(named: Constants.Cache.categoriesFileName)
+            ),
+            productsCache: KeyedDiskCache(
+                fileURL: try KeyedDiskCache<CategoryProducts>.defaultFileURL(named: Constants.Cache.categoryProductsFileName)
+            )
+        )
 
         let getCategoryProducts = DefaultGetCategoryProductsUseCase(repository: categoryRepository)
         let searchUseCase = DefaultSearchProductsUseCase(repository: RemoteProductSearchRepository(remote: remote))

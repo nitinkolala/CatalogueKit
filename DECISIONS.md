@@ -43,6 +43,7 @@ View -> ViewModel -> UseCase   ->   Express route -> ProductService  ->  Product
 | A9 | Prices and currency | Prices are shown in USD because Fake Store uses USD. Currency is a constant, not locale-driven. | `Constants.Currency` |
 | A10 | Empty and error states | Featured products: a fresh saved list is shown without a network call. When the backend is unreachable, the last saved list is shown. A failed refresh while products are on screen keeps them and shows "Couldn't refresh. Showing saved products." with a retry. If nothing is saved and the request fails, a retry message appears. Categories: a failed request shows a message with a retry. A backend that returns no categories hides the section. | `FeaturedProductsRepository.swift`, `HomeViewModel.swift`, `CategoriesSectionView.swift` |
 | A11 | Featured count | The app shows every product the backend sends, in order. The count is set only on the backend, so it cannot drift from the app. | `GetFeaturedProductsUseCase.swift`, `productService.ts` |
+| A12 | Security | Security is out of scope for this PoC. Threats such as man-in-the-middle attacks are not in scope for now. | Not implemented |
 
 ## 4. Requirements dropped or simplified
 

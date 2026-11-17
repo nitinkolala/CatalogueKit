@@ -49,6 +49,7 @@ Each of these was written by the AI, and caught by a test, a screen check, or a 
 - **The Message editor drew a black box in dark mode.** Caught on a dark-mode screenshot. Fixed by hiding the editor's own background.
 - **`.DS_Store` files were staged in an early commit.** Caught in `git status`. Fixed by unstaging them and excluding them from later commits.
 - **Stale documents.** The earlier notes in this file and in `DECISIONS.md` gave test counts and claims that no longer matched the code (for example, "phone required" and an SMTP catcher that was never built). Caught in the audit. Both documents were rewritten against the current code.
+- **Home reloaded on every return.** `load()` on Home ran each time the view appeared, so coming back from a product page or a category page reloaded the data when it was not needed. Caught by [fill in: how you noticed it]. Fixed in [fill in: file and change].
 
 ## 6. How I reviewed AI output
 

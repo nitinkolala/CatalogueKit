@@ -10,8 +10,12 @@ nonisolated enum Constants {
     enum Cache {
         /// How long a fetched featured list is served without asking the backend again.
         static let featuredTTL: TimeInterval = 300
+        /// How long categories and category product lists are served without asking the backend again.
+        static let categoryTTL: TimeInterval = 300
         static let directoryName = "CatalogueKitCache"
         static let productsFileName = "featured-products.json"
+        static let categoriesFileName = "categories.json"
+        static let categoryProductsFileName = "category-products.json"
     }
 
     enum Home {
