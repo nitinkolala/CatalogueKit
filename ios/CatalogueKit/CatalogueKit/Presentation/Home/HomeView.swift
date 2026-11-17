@@ -2,55 +2,113 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
-    @State private var path: [Product] = []
+    @State private var search: ProductSearchViewModel
+    @State private var path: [AppRoute] = []
+    @FocusState private var searchFocused: Bool
     private let imageLoader: ImageLoader
+    private let makeCategoryViewModel: (ProductCategory) -> CategoryViewModel
+    private let makeCategorySearchViewModel: (ProductCategory) -> ProductSearchViewModel
 
-    init(viewModel: HomeViewModel, imageLoader: ImageLoader) {
+    init(
+        viewModel: HomeViewModel,
+        search: ProductSearchViewModel,
+        imageLoader: ImageLoader,
+        makeCategoryViewModel: @escaping (ProductCategory) -> CategoryViewModel,
+        makeCategorySearchViewModel: @escaping (ProductCategory) -> ProductSearchViewModel
+    ) {
         _viewModel = State(initialValue: viewModel)
+        _search = State(initialValue: search)
         self.imageLoader = imageLoader
+        self.makeCategoryViewModel = makeCategoryViewModel
+        self.makeCategorySearchViewModel = makeCategorySearchViewModel
     }
 
     var body: some View {
         NavigationStack(path: $path) {
-            content
+            HomeContentView(
+                viewModel: viewModel,
+                search: search,
+                imageLoader: imageLoader,
+                dismissSearchKeyboard: { searchFocused = false }
+            )
                 .navigationTitle(L10n.homeTitle)
-                .navigationDestination(for: Product.self) { product in
-                    ProductDetailView(product: product, imageLoader: imageLoader)
+                .searchable(
+                    text: $search.query,
+                    placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: L10n.searchPrompt
+                )
+                .searchFocused($searchFocused)
+                .onSubmit(of: .search) {
+                    search.submit()
+                    searchFocused = false
+                }
+                .textInputAutocapitalization(.never)
+                .navigationDestination(for: AppRoute.self) { route in
+                    destination(for: route)
                 }
                 .task { await viewModel.load() }
         }
     }
 
     @ViewBuilder
-    private var content: some View {
+    private func destination(for route: AppRoute) -> some View {
+        switch route {
+        case .product(let product):
+            ProductDetailView(product: product, imageLoader: imageLoader)
+        case .category(let category):
+            CategoryView(
+                viewModel: makeCategoryViewModel(category),
+                search: makeCategorySearchViewModel(category),
+                imageLoader: imageLoader
+            )
+        }
+    }
+}
+
+/// The Home content under the search field. Shows results while searching, recent searches while the field is
+/// open but empty, and the featured and category sections otherwise.
+private struct HomeContentView: View {
+    @Environment(\.isSearching) private var isSearching
+    let viewModel: HomeViewModel
+    let search: ProductSearchViewModel
+    let imageLoader: ImageLoader
+    let dismissSearchKeyboard: () -> Void
+
+    var body: some View {
+        if search.isActive {
+            SearchResultsView(search: search, imageLoader: imageLoader, onScroll: dismissSearchKeyboard)
+        } else if isSearching {
+            RecentSearchesView(search: search)
+        } else {
+            homeScroll
+        }
+    }
+
+    private var homeScroll: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: Constants.Home.sectionSpacing) {
+                featuredContent
+                CategoriesSectionView(state: viewModel.categories)
+            }
+            .padding(Constants.Home.gridSpacing)
+        }
+        .refreshable { await viewModel.load(forceRefresh: true) }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    @ViewBuilder
+    private var featuredContent: some View {
         switch viewModel.state {
         case .idle, .loading:
             ProgressView()
+                .frame(maxWidth: .infinity)
         case .loaded(let products):
-            productGrid(products)
+            FeaturedRowView(products: products, imageLoader: imageLoader)
         case .empty:
             message(L10n.homeEmpty, showsRetry: false)
         case .failed:
             message(L10n.homeLoadFailed, showsRetry: true)
         }
-    }
-
-    private func productGrid(_ products: [Product]) -> some View {
-        ScrollView {
-            LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: Constants.Home.gridMinimumWidth), spacing: Constants.Home.gridSpacing)],
-                spacing: Constants.Home.gridSpacing
-            ) {
-                ForEach(products) { product in
-                    NavigationLink(value: product) {
-                        ProductCardView(product: product, imageLoader: imageLoader)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(Constants.Home.gridSpacing)
-        }
-        .refreshable { await viewModel.load(forceRefresh: true) }
     }
 
     private func message(_ text: String, showsRetry: Bool) -> some View {
@@ -65,5 +123,6 @@ struct HomeView: View {
             }
         }
         .padding(Constants.Home.gridSpacing)
+        .frame(maxWidth: .infinity)
     }
 }

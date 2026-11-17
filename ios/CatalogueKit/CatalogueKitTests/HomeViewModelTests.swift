@@ -8,9 +8,24 @@ final class HomeViewModelTests: XCTestCase {
         func execute(forceRefresh: Bool) async throws -> [Product] { try result.get() }
     }
 
+    private struct FixedCategoriesUseCase: GetCategoriesUseCase {
+        let result: Result<[ProductCategory], Error>
+        func execute() async throws -> [ProductCategory] { try result.get() }
+    }
+
+    private func viewModel(
+        products: Result<[Product], Error> = .success([]),
+        categories: Result<[ProductCategory], Error> = .success([])
+    ) -> HomeViewModel {
+        HomeViewModel(
+            getFeaturedProducts: FixedUseCase(result: products),
+            getCategories: FixedCategoriesUseCase(result: categories)
+        )
+    }
+
     func testLoadedStateWhenProductsArrive() async {
         let products = [TestData.product(id: 1)]
-        let viewModel = HomeViewModel(getFeaturedProducts: FixedUseCase(result: .success(products)))
+        let viewModel = viewModel(products: .success(products))
 
         await viewModel.load()
 
@@ -18,7 +33,7 @@ final class HomeViewModelTests: XCTestCase {
     }
 
     func testEmptyStateWhenNoProducts() async {
-        let viewModel = HomeViewModel(getFeaturedProducts: FixedUseCase(result: .success([])))
+        let viewModel = viewModel(products: .success([]))
 
         await viewModel.load()
 
@@ -26,7 +41,7 @@ final class HomeViewModelTests: XCTestCase {
     }
 
     func testFailedStateWhenUseCaseThrows() async {
-        let viewModel = HomeViewModel(getFeaturedProducts: FixedUseCase(result: .failure(StubError.offline)))
+        let viewModel = viewModel(products: .failure(StubError.offline))
 
         await viewModel.load()
 
@@ -35,14 +50,43 @@ final class HomeViewModelTests: XCTestCase {
 
     func testRefreshKeepsLoadedProductsWhenItFails() async {
         let products = [TestData.product(id: 1)]
-        let viewModel = HomeViewModel(getFeaturedProducts: FixedUseCase(result: .success(products)))
+        let viewModel = viewModel(products: .success(products))
         await viewModel.load()
 
-        let failing = HomeViewModel(getFeaturedProducts: FixedUseCase(result: .failure(StubError.offline)))
+        let failing = self.viewModel(products: .failure(StubError.offline))
         await failing.load()
         XCTAssertEqual(failing.state, .failed)
 
         await viewModel.load(forceRefresh: true)
         XCTAssertEqual(viewModel.state, .loaded(products))
+    }
+
+    func testCategoriesLoadInBackendOrder() async {
+        let categories = [ProductCategory(name: "jewelery"), ProductCategory(name: "electronics")]
+        let viewModel = viewModel(categories: .success(categories))
+
+        await viewModel.load()
+
+        XCTAssertEqual(viewModel.categories, .loaded(categories))
+    }
+
+    func testCategoriesHiddenWhenBackendReturnsNone() async {
+        let viewModel = viewModel(categories: .success([]))
+
+        await viewModel.load()
+
+        XCTAssertEqual(viewModel.categories, .hidden)
+    }
+
+    func testCategoriesHiddenWhenRequestFails() async {
+        let viewModel = viewModel(
+            products: .success([TestData.product(id: 1)]),
+            categories: .failure(StubError.offline)
+        )
+
+        await viewModel.load()
+
+        XCTAssertEqual(viewModel.categories, .hidden)
+        XCTAssertEqual(viewModel.state, .loaded([TestData.product(id: 1)]))
     }
 }

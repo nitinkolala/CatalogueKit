@@ -34,6 +34,18 @@ export function rankTopRated(products: readonly Product[], limit: number): Produ
     .slice(0, limit);
 }
 
+/** Distinct category names, sorted A to Z. Empty categories are skipped. */
+export function distinctCategories(products: readonly Product[]): string[] {
+  const names = new Set(products.map((product) => product.category.trim()).filter((name) => name.length > 0));
+  return [...names].sort((a, b) => a.localeCompare(b));
+}
+
+/** A category's products: the top-rated ones first, then the rest in the same order. */
+export interface CategoryPage {
+  topRated: Product[];
+  more: Product[];
+}
+
 /** One entry in the admin-curated featured list. `available` overrides the product's own flag when set. */
 export interface FeaturedEntry {
   id: number;

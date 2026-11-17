@@ -27,6 +27,21 @@ describe('ProductService', () => {
     expect(featured.map((p) => p.id)).toEqual([7, 6, 5, 4, 3]);
   });
 
+  it('splits a category into top rated and the rest, and returns undefined for unknown categories', async () => {
+    const service = new ProductService({
+      source: countingSource([
+        { ...product(1, 2), category: 'a' },
+        { ...product(2, 5), category: 'a' },
+        { ...product(3, 4), category: 'b' },
+      ]),
+      cacheTtlMs: 60_000,
+    });
+    const page = await service.productsInCategory('a', 1);
+    expect(page?.topRated.map((p) => p.id)).toEqual([2]);
+    expect(page?.more.map((p) => p.id)).toEqual([1]);
+    expect(await service.productsInCategory('missing', 1)).toBeUndefined();
+  });
+
   it('serves repeated reads from the cache until the TTL expires', async () => {
     let now = 0;
     const source = countingSource([product(1, 1)]);

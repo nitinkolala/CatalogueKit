@@ -4,6 +4,27 @@
 "home.load_failed" = "We couldn't load products. Check your connection and try again.";
 "home.retry" = "Try again";
 "home.rating_label" = "Rated %1$@ from %2$d reviews";
+"home.categories_title" = "Categories";
+"home.featured_scroll_left" = "Scroll featured products left";
+"home.featured_scroll_right" = "Scroll featured products right";
+
+/* Category */
+"category.top_rated" = "Top rated";
+"category.more" = "More products";
+"category.empty" = "No products in this category yet.";
+"category.load_failed" = "We couldn't load this category. Check your connection and try again.";
 
 /* Product */
 "product.out_of_stock" = "Out of stock";
+
+/* Search */
+"search.prompt" = "Search products";
+"search.hint" = "Type at least 2 characters to search.";
+"search.recent_title" = "Recent searches";
+"search.recent_clear" = "Clear";
+"search.no_matches" = "No products match '%@'";
+"search.no_matches_hint" = "Check the spelling or try fewer words.";
+"search.offline" = "You're offline. Your search will run again when you reconnect.";
+"search.failed" = "Search failed. Check your connection and try again.";
+"search.result_count_one" = "1 result";
+"search.result_count_other" = "%d results";

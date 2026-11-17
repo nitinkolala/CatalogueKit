@@ -8,4 +8,29 @@ nonisolated enum L10n {
     static let homeRetry = String(localized: "home.retry")
     static let ratingLabel = String(localized: "home.rating_label")
     static let outOfStock = String(localized: "product.out_of_stock")
+    static let featuredScrollLeft = String(localized: "home.featured_scroll_left")
+    static let featuredScrollRight = String(localized: "home.featured_scroll_right")
+    static let categoriesTitle = String(localized: "home.categories_title")
+    static let categoryTopRated = String(localized: "category.top_rated")
+    static let categoryMore = String(localized: "category.more")
+    static let categoryEmpty = String(localized: "category.empty")
+    static let categoryLoadFailed = String(localized: "category.load_failed")
+
+    static let searchPrompt = String(localized: "search.prompt")
+    static let searchHint = String(localized: "search.hint")
+    static let searchRecentTitle = String(localized: "search.recent_title")
+    static let searchRecentClear = String(localized: "search.recent_clear")
+    static let searchNoMatchesHint = String(localized: "search.no_matches_hint")
+    static let searchOffline = String(localized: "search.offline")
+    static let searchFailed = String(localized: "search.failed")
+
+    static func searchNoMatches(_ term: String) -> String {
+        String(format: String(localized: "search.no_matches"), term)
+    }
+
+    static func searchResultCount(_ count: Int) -> String {
+        count == 1
+            ? String(localized: "search.result_count_one")
+            : String(format: String(localized: "search.result_count_other"), count)
+    }
 }
