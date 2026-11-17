@@ -9,21 +9,25 @@ struct ProductCardView: View {
             CachedImageView(url: product.imageURL, loader: imageLoader)
                 .frame(height: Constants.Home.cardImageHeight)
                 .frame(maxWidth: .infinity)
+                .overlay(alignment: .topLeading) {
+                    if !product.available {
+                        Text(L10n.outOfStock)
+                            .font(.caption.bold())
+                            .foregroundStyle(.red)
+                            .padding(Constants.Home.cardPadding)
+                    }
+                }
             Text(product.title)
                 .font(.subheadline)
-                .lineLimit(2)
+                .lineLimit(2, reservesSpace: true)
             Text(product.price, format: .currency(code: Constants.Currency.code))
                 .font(.headline)
-            if !product.available {
-                Text(L10n.outOfStock)
-                    .font(.caption.bold())
-                    .foregroundStyle(.red)
-            }
             Text(ProductFormatting.ratingText(for: product))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .padding(Constants.Home.cardPadding)
+        .frame(maxWidth: .infinity, alignment: .top)
         .background(.background.secondary, in: RoundedRectangle(cornerRadius: Constants.Home.cardCornerRadius))
         .contentShape(Rectangle())
     }
