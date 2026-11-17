@@ -1,0 +1,85 @@
+/* Home feature */
+"home.title" = "Featured";
+"home.empty" = "No featured products yet.";
+"home.load_failed" = "We couldn't load products. Check your connection and try again.";
+"home.retry" = "Try again";
+"home.rating_label" = "Rated %1$@ from %2$d reviews";
+"home.categories_title" = "Categories";
+"home.featured_scroll_left" = "Scroll featured products left";
+"home.featured_scroll_right" = "Scroll featured products right";
+
+/* Category */
+"category.top_rated" = "Top rated";
+"category.more" = "More products";
+"category.empty" = "No products in this category yet.";
+"category.load_failed" = "We couldn't load this category. Check your connection and try again.";
+
+/* Product */
+"product.out_of_stock" = "Out of stock";
+
+/* Search */
+"search.prompt" = "Search products";
+"search.hint" = "Type at least 2 characters to search.";
+"search.recent_title" = "Recent searches";
+"search.recent_clear" = "Clear";
+"search.no_matches" = "No products match '%@'";
+"search.no_matches_hint" = "Check the spelling or try fewer words.";
+"search.offline" = "You're offline. Your search will run again when you reconnect.";
+"search.failed" = "Search failed. Check your connection and try again.";
+"search.result_count_one" = "1 result";
+"search.result_count_other" = "%d results";
+
+/* Product page */
+"product.in_stock" = "In stock";
+"product.show_more" = "Show more";
+"product.show_less" = "Show less";
+"product.specifications" = "Specifications";
+"product.spec_category" = "Category";
+"product.spec_id" = "Product ID";
+"product.spec_rating" = "Rating";
+"product.not_found" = "We couldn't find this product. It may have been removed.";
+"product.back" = "Back";
+"product.offline" = "You're offline. Showing the last details you loaded.";
+"product.load_failed" = "We couldn't refresh this product. Check your connection and try again.";
+"product.image_label" = "Image %1$d of %2$d for %3$@";
+
+
+/* Enquiry */
+"enquiry.enquire" = "Enquire";
+"enquiry.title" = "Enquire about this product";
+"enquiry.name_label" = "Name";
+"enquiry.email_label" = "Email";
+"enquiry.phone_label" = "Phone (optional)";
+"enquiry.message_label" = "Message";
+"enquiry.marketing" = "Send me offers and news about this range";
+"enquiry.privacy" = "We use your details only to answer this enquiry.";
+"enquiry.privacy_link" = "Read our privacy policy";
+"enquiry.submit" = "Submit";
+"enquiry.sent_title" = "Thank you";
+"enquiry.sent_body" = "Your enquiry has been sent. We will be in touch soon.";
+"enquiry.back_to_product" = "Back to product";
+"enquiry.discard_title" = "Discard your enquiry?";
+"enquiry.discard" = "Discard";
+"enquiry.keep_writing" = "Keep writing";
+"enquiry.error_name" = "Enter your name";
+"enquiry.error_email" = "Enter a valid email address, such as name@example.com";
+"enquiry.error_phone" = "Enter a 10-digit phone number, or leave this blank";
+"enquiry.error_message" = "Enter a message";
+"enquiry.errors_announcement" = "Some fields need attention.";
+"enquiry.sent_announcement" = "Thank you. Your enquiry has been sent.";
+"enquiry.failed_announcement" = "Your enquiry could not be sent.";
+"enquiry.failed" = "We couldn't send your enquiry. Check your connection and try again. What you typed is still here.";
+"enquiry.offline" = "You're offline. What you typed is still here. Try again when you reconnect.";
+"enquiry.required_suffix" = "required";
+"enquiry.optional_suffix" = "optional";
+"enquiry.done" = "Done";
+"enquiry.counter" = "%1$d of %2$d characters";
+"enquiry.back" = "Back";
+"enquiry.about_label" = "Enquiring about";
+"enquiry.quick_title" = "Quick questions";
+"enquiry.prompt_stock" = "Is it in stock?";
+"enquiry.prompt_delivery" = "What are the delivery options?";
+"enquiry.prompt_warranty" = "What does the warranty cover?";
+"enquiry.message_placeholder" = "Tell us what you would like to know";
+"home.categories_load_failed" = "Categories couldn't load.";
+"home.featured_stale" = "Couldn't refresh. Showing saved products.";
