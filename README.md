@@ -17,6 +17,8 @@ Related documents: [DECISIONS.md](DECISIONS.md) (assumptions and trade-offs), [A
 
 No paid services or accounts are needed.
 
+> **Install Brew if needed.** The backend needs Node.js, and the easiest way to install it on macOS is with Homebrew. If `brew --version` fails, install Homebrew first from [brew.sh](https://brew.sh), then run `brew install node@22`. Without Homebrew, install Node 22 from [nodejs.org](https://nodejs.org) instead.
+
 ## 1. Run the backend
 
 ```bash
