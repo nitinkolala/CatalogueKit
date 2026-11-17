@@ -31,6 +31,8 @@ nonisolated struct FeaturedProductsRepository: ProductRepository {
             let fresh = try await remote.featuredProducts()
             await cache.save(fresh, at: current)
             return FeaturedProducts(items: fresh, isStale: false)
+        } catch is CancellationError {
+            throw CancellationError()
         } catch {
             if let stale = await cache.load() {
                 return FeaturedProducts(items: stale.products, isStale: true)

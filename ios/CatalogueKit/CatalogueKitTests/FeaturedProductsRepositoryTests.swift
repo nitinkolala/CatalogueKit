@@ -124,6 +124,33 @@ final class FeaturedProductsRepositoryTests: XCTestCase {
             XCTAssertEqual(error as? StubError, .offline)
         }
     }
+
+    func testCancelledRequestDoesNotFallBackToSavedList() async throws {
+        let cacheFile = TestData.tempFile()
+        let clock = Clock(Date(timeIntervalSince1970: 0))
+        let body = try TestData.wireBody([TestData.product(id: 9)])
+        let online = makeRepository(
+            client: StubHTTPClient { _ in body },
+            cacheFile: cacheFile,
+            now: { clock.now }
+        )
+        _ = try await online.featuredProducts()
+
+        // The cache is now expired, so the next call goes to the backend, and that request is cancelled.
+        clock.now = Date(timeIntervalSince1970: 301)
+        let cancelled = makeRepository(
+            client: StubHTTPClient { _ in throw CancellationError() },
+            cacheFile: cacheFile,
+            now: { clock.now }
+        )
+
+        do {
+            _ = try await cancelled.featuredProducts()
+            XCTFail("A cancelled load must not return saved products as a stale result")
+        } catch {
+            XCTAssertTrue(error is CancellationError)
+        }
+    }
 }
 
 /// Mutable clock for deterministic cache-expiry tests.

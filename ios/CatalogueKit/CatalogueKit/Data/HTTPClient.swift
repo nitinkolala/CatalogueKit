@@ -21,14 +21,7 @@ nonisolated struct URLSessionHTTPClient: HTTPClient {
     func data(from url: URL) async throws -> Data {
         var request = URLRequest(url: url)
         request.timeoutInterval = Constants.Network.requestTimeout
-        let (data, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse else {
-            throw HTTPError.invalidResponse
-        }
-        guard Constants.Network.successStatusRange.contains(http.statusCode) else {
-            throw HTTPError.unexpectedStatus(http.statusCode)
-        }
-        return data
+        return try await send(request)
     }
 
     func post(_ url: URL, body: Data) async throws -> Data {
@@ -37,7 +30,19 @@ nonisolated struct URLSessionHTTPClient: HTTPClient {
         request.httpBody = body
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = Constants.Network.requestTimeout
-        let (data, response) = try await session.data(for: request)
+        return try await send(request)
+    }
+
+    /// Runs the request and checks the status. A request cancelled by its task is reported as `CancellationError`,
+    /// not as a network failure, so callers can stop without showing an error or falling back to saved data.
+    private func send(_ request: URLRequest) async throws -> Data {
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch let error as URLError where error.code == .cancelled {
+            throw CancellationError()
+        }
         guard let http = response as? HTTPURLResponse else {
             throw HTTPError.invalidResponse
         }
